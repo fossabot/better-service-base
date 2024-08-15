@@ -1,9 +1,10 @@
-import { EventEmitter } from "events";
-import { Readable } from "stream";
-import { randomUUID } from "crypto";
-import { IPluginLogger } from "../../../";
+import {EventEmitter} from "node:events";
+import {Readable} from "node:stream";
+import {randomUUID} from "node:crypto";
+import {IPluginLogger} from "../../../index";
 
-export class emitStreamAndReceiveStream extends EventEmitter {
+export class emitStreamAndReceiveStream
+    extends EventEmitter {
   // If we try receive or send a stream and the other party is not ready for some reason, we will automatically timeout in 5s.
   private readonly staticCommsTimeout = 1000;
   private log: IPluginLogger;
@@ -12,14 +13,15 @@ export class emitStreamAndReceiveStream extends EventEmitter {
     super();
     this.log = log;
   }
+
   public dispose() {
     this.removeAllListeners();
   }
 
   async receiveStream(
-    event: string,
-    listener: { (error: Error | null, stream: Readable): Promise<void> },
-    timeoutSeconds: number = 60
+      event: string,
+      listener: { (error: Error | null, stream: Readable): Promise<void> },
+      timeoutSeconds: number = 60,
   ): Promise<string> {
     const streamId = `${randomUUID()}=${timeoutSeconds}`;
     this.log.debug("receiveStream: listening to {streamId}", {
@@ -49,17 +51,19 @@ export class emitStreamAndReceiveStream extends EventEmitter {
   }
 
   async sendStream(
-    event: string,
-    streamId: string,
-    stream: Readable
+      event: string,
+      streamId: string,
+      stream: Readable,
   ): Promise<void> {
     const self = this;
-    this.log.debug("sendStream: emitting _self-{streamId}", { streamId });
+    this.log.debug("sendStream: emitting _self-{streamId}", {streamId});
     return new Promise((resolve, rejectI) => {
       const timeout = Number.parseInt(streamId.split("=")[1]);
       const clearSessions = (e?: Error) => {
         stream.destroy(e);
-        if (receiptTimeoutHandler !== null) clearTimeout(receiptTimeoutHandler);
+        if (receiptTimeoutHandler !== null) {
+          clearTimeout(receiptTimeoutHandler);
+        }
         receiptTimeoutHandler = null;
         clearTimeout(timeoutHandler);
         self.removeAllListeners(`${streamId}-emit`);
@@ -77,7 +81,9 @@ export class emitStreamAndReceiveStream extends EventEmitter {
         reject(new Error("Stream Timeout"));
       }, timeout * 1000);
       self.once(`${streamId}-emit`, () => {
-        if (receiptTimeoutHandler !== null) clearTimeout(receiptTimeoutHandler);
+        if (receiptTimeoutHandler !== null) {
+          clearTimeout(receiptTimeoutHandler);
+        }
         receiptTimeoutHandler = null;
       });
       self.once(`${streamId}-end`, () => {

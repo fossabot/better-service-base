@@ -4,15 +4,12 @@ import {
   BSBService,
   BSBServiceClient,
   BSBServiceConstructor,
-} from "./base";
-import {
   LoggingConfig,
   EventsConfig,
-  PluginDefition,
-  PluginType,
-} from "./interfaces";
-import { ServiceBase } from "./serviceBase";
-import { randomUUID } from "crypto";
+  PluginDefinition,
+  PluginType, ServiceBase,
+} from "./index";
+import {v7 as randomUUID} from "uuid";
 
 export class SBClient<Client extends BSBServiceClient> {
   private serviceBase: ServiceBase;
@@ -20,6 +17,7 @@ export class SBClient<Client extends BSBServiceClient> {
 
   private useDefaultConfigPlugin: boolean;
   private configSetup: boolean = false;
+
   constructor(useDefaultConfigPlugin: boolean = false) {
     this.useDefaultConfigPlugin = useDefaultConfigPlugin;
     const CWD = process.env.APP_DIR || process.cwd();
@@ -30,70 +28,90 @@ export class SBClient<Client extends BSBServiceClient> {
     if (!this.useDefaultConfigPlugin && !this.configSetup) {
       this.configSetup = true;
       this.serviceBase.setConfigPlugin(
-        "config-bsb-internal-client",
-        FakeServiceConfig
+          "config-bsb-internal-client",
+          FakeServiceConfig,
       );
     }
     const service = this.serviceBase.addService(
-      "service-bsb-internal-client-" + randomUUID(),
-      FakeServiceClient,
-      {}
+        "service-bsb-internal-client-" + randomUUID(),
+        FakeServiceClient,
+        {},
     );
-    return new (client as any)(service, ...args);
+    return new (
+        client as any
+    )(service, ...args);
   }
 
   public async init() {
     await this.serviceBase.init();
   }
+
   public async run() {
     await this.serviceBase.run();
   }
 }
 
-export class FakeServiceClient extends BSBService<null> {
+export class FakeServiceClient
+    extends BSBService<null> {
   public initBeforePlugins?: string[] | undefined;
   public initAfterPlugins?: string[] | undefined;
   public runBeforePlugins?: string[] | undefined;
   public runAfterPlugins?: string[] | undefined;
   public methods = {};
+
   dispose?(): void;
+
   init?(): void | Promise<void> {
     throw new Error("Method not implemented.");
   }
+
   run?(): void | Promise<void> {
     throw new Error("Method not implemented.");
   }
+
   constructor(config: BSBServiceConstructor) {
     super(config);
   }
 }
 
-export class FakeServiceConfig extends BSBConfig {
+export class FakeServiceConfig
+    extends BSBConfig {
   constructor(config: BSBConfigConstructor) {
     super(config);
   }
+
   async getLoggingPlugins(): Promise<Record<string, LoggingConfig>> {
     return {};
   }
+
+  async getMetricsPlugins(): Promise<Record<string, PluginDefinition>> {
+    return {};
+  }
+
   async getEventsPlugins(): Promise<Record<string, EventsConfig>> {
     return {};
   }
-  async getServicePlugins(): Promise<Record<string, PluginDefition>> {
+
+  async getServicePlugins(): Promise<Record<string, PluginDefinition>> {
     return {};
   }
+
   async getServicePluginDefinition(
-    pluginName: string
+      pluginName: string,
   ): Promise<{ name: string; enabled: boolean }> {
-    return { name: pluginName, enabled: false };
+    return {name: pluginName, enabled: false};
   }
+
   async getPluginConfig(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    pluginType: PluginType,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    plugin: string
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      pluginType: PluginType,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      plugin: string,
   ): Promise<object | null> {
     return null;
   }
+
   dispose?(): void;
+
   init?(): void;
 }

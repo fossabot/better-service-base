@@ -3,7 +3,7 @@ import emit from "./events/emit";
 import emitAndReturn from "./events/emitAndReturn";
 import emitStreamAndReceiveStream from "./events/emitStreamAndReceiveStream";
 import broadcast from "./events/broadcast";
-import { BSBEvents, BSBEventsConstructor } from "../../base/events";
+import { BSBEvents, BSBEventsConstructor } from "../../base/BSBEvents";
 
 export class Plugin extends BSBEvents {
   init?(): void;

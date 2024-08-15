@@ -1,12 +1,12 @@
-import { BSBEvents, SmartFunctionCallSync } from "../../../..";
+import {BSBEvents, SmartFunctionCallSync} from "../../../../index";
 import * as assert from "assert";
-import { randomUUID } from "crypto";
+import {randomUUID} from "crypto";
 
 const randomName = () => randomUUID();
 
 export function emitAndReturn(
-  genNewPlugin: { (): Promise<BSBEvents> },
-  maxTimeoutToExpectAResponse: number
+    genNewPlugin: { (): Promise<BSBEvents> },
+    maxTimeoutToExpectAResponse: number,
 ) {
   let emitter: BSBEvents;
   beforeEach(async () => {
@@ -40,10 +40,10 @@ export function emitAndReturn(
         });
         console.log("!!Received onEvent");
         await emitter.emitEventAndReturn(
-          thisPlugin2,
-          thisEvent,
-          maxTimeoutToExpectAResponse / 1000,
-          []
+            thisPlugin2,
+            thisEvent,
+            maxTimeoutToExpectAResponse / 1000,
+            [],
         );
         console.log("++Received onEvent");
         clearTimeout(emitTimeout);
@@ -65,10 +65,10 @@ export function emitAndReturn(
         });
         console.log("!!Received onEvent");
         await emitter.emitEventAndReturn(
-          thisPlugin,
-          thisEvent,
-          maxTimeoutToExpectAResponse / 1000,
-          []
+            thisPlugin,
+            thisEvent,
+            maxTimeoutToExpectAResponse / 1000,
+            [],
         );
         console.log("++Received onEvent");
         clearTimeout(emitTimeout);
@@ -86,10 +86,10 @@ export function emitAndReturn(
           return emitData2;
         });
         await emitter.emitEventAndReturn(
-          thisCaller,
-          thisEvent,
-          maxTimeoutToExpectAResponse / 1000,
-          [emitData]
+            thisCaller,
+            thisEvent,
+            maxTimeoutToExpectAResponse / 1000,
+            [emitData],
         );
         clearTimeout(emitTimeout);
         assert.ok(true, "Received Response");
@@ -107,14 +107,15 @@ export function emitAndReturn(
         });
         try {
           await emitter.emitEventAndReturn(
-            thisPlugin,
-            thisEvent2,
-            maxTimeoutToExpectAResponse / 1000,
-            [emitData]
+              thisPlugin,
+              thisEvent2,
+              maxTimeoutToExpectAResponse / 1000,
+              [emitData],
           );
           clearTimeout(emitTimeout);
           assert.fail("EEAR Returned");
-        } catch (exc) {
+        }
+        catch (exc) {
           clearTimeout(emitTimeout);
           assert.ok("Timeout of EEAR");
         }
@@ -132,14 +133,15 @@ export function emitAndReturn(
         });
         try {
           await emitter.emitEventAndReturn(
-            thisCaller,
-            thisEvent2,
-            maxTimeoutToExpectAResponse / 1000,
-            [emitData]
+              thisCaller,
+              thisEvent2,
+              maxTimeoutToExpectAResponse / 1000,
+              [emitData],
           );
           clearTimeout(emitTimeout);
           assert.fail("EEAR Returned");
-        } catch (exc) {
+        }
+        catch (exc) {
           clearTimeout(emitTimeout);
           assert.ok("Timeout of EEAR");
         }
@@ -151,17 +153,19 @@ export function emitAndReturn(
         const emitTimeout = setTimeout(() => {
           assert.fail("Event not received");
         }, timermaxTimeoutToExpectAResponse);
-        await emitter.onReturnableEvent(thisCaller, thisEvent, async () => {});
+        await emitter.onReturnableEvent(thisCaller, thisEvent, async () => {
+        });
         try {
           await emitter.emitEventAndReturn(
-            thisCaller,
-            thisEvent,
-            maxTimeoutToExpectAResponse / 1000,
-            [emitData]
+              thisCaller,
+              thisEvent,
+              maxTimeoutToExpectAResponse / 1000,
+              [emitData],
           );
           clearTimeout(emitTimeout);
           assert.fail("EEAR Returned");
-        } catch (exc) {
+        }
+        catch (exc) {
           clearTimeout(emitTimeout);
           assert.ok("Timeout of EEAR");
         }
@@ -178,14 +182,15 @@ export function emitAndReturn(
         });
         try {
           await emitter.emitEventAndReturn(
-            thisCaller,
-            thisEvent,
-            maxTimeoutToExpectAResponse / 1000,
-            [emitData]
+              thisCaller,
+              thisEvent,
+              maxTimeoutToExpectAResponse / 1000,
+              [emitData],
           );
           clearTimeout(emitTimeout);
           assert.fail("EEAR Returned");
-        } catch (exc) {
+        }
+        catch (exc) {
           clearTimeout(emitTimeout);
           assert.ok("EEAR");
           assert.strictEqual(exc, "THISISANERROR");
@@ -224,7 +229,11 @@ export function emitAndReturn(
       },
       {
         name: "Array",
-        data: [0, "Hello", true],
+        data: [
+          0,
+          "Hello",
+          true,
+        ],
       },
       {
         name: "Object",
@@ -233,7 +242,10 @@ export function emitAndReturn(
           surname: "Blond",
           age: 24,
           meta: {
-            location: [-12212, 55336],
+            location: [
+              -12212,
+              55336,
+            ],
           },
         },
       },
@@ -249,23 +261,23 @@ export function emitAndReturn(
           }, timermaxTimeoutToExpectAResponse);
           await emitter.onReturnableEvent(thisPlugin, thisEvent, async () => {
             return typeToTest.rData !== undefined
-              ? typeToTest.rData
-              : typeToTest.data;
+                   ? typeToTest.rData
+                   : typeToTest.data;
           });
           const resp = await emitter.emitEventAndReturn(
-            thisPlugin,
-            thisEvent,
-            maxTimeoutToExpectAResponse / 1000,
-            [typeToTest.data]
+              thisPlugin,
+              thisEvent,
+              maxTimeoutToExpectAResponse / 1000,
+              [typeToTest.data],
           );
           clearTimeout(emitTimeout);
           assert.strictEqual(
-            JSON.stringify(resp),
-            JSON.stringify(
-              typeToTest.rData !== undefined
-                ? typeToTest.rData
-                : typeToTest.data
-            )
+              JSON.stringify(resp),
+              JSON.stringify(
+                  typeToTest.rData !== undefined
+                  ? typeToTest.rData
+                  : typeToTest.data,
+              ),
           );
         });
         it("should be able to emit to events with self", async () => {
@@ -276,29 +288,29 @@ export function emitAndReturn(
             assert.fail("Event not received - timeout");
           }, timermaxTimeoutToExpectAResponse);
           await emitter.onReturnableEvent(
-            thisCaller,
-            thisEvent,
-            async (data: Array<any>) => {
-              clearTimeout(emitTimeout);
-              assert.strictEqual(
-                JSON.stringify(data[0]),
-                JSON.stringify(typeToTest.data),
-                "Received data"
-              );
-              return typeToTest.rData || typeToTest.data;
-            }
+              thisCaller,
+              thisEvent,
+              async (data: Array<any>) => {
+                clearTimeout(emitTimeout);
+                assert.strictEqual(
+                    JSON.stringify(data[0]),
+                    JSON.stringify(typeToTest.data),
+                    "Received data",
+                );
+                return typeToTest.rData || typeToTest.data;
+              },
           );
           assert.strictEqual(
-            JSON.stringify(
-              await emitter.emitEventAndReturn(
-                thisCaller,
-                thisEvent,
-                maxTimeoutToExpectAResponse / 1000,
-                [typeToTest.data]
-              )
-            ),
-            JSON.stringify(typeToTest.rData || typeToTest.data),
-            "Returned data"
+              JSON.stringify(
+                  await emitter.emitEventAndReturn(
+                      thisCaller,
+                      thisEvent,
+                      maxTimeoutToExpectAResponse / 1000,
+                      [typeToTest.data],
+                  ),
+              ),
+              JSON.stringify(typeToTest.rData || typeToTest.data),
+              "Returned data",
           );
           clearTimeout(emitTimeout);
         });
@@ -315,14 +327,15 @@ export function emitAndReturn(
           });
           try {
             await emitter.emitEventAndReturn(
-              thisPlugin,
-              thisEvent2,
-              maxTimeoutToExpectAResponse / 1000,
-              [typeToTest.data]
+                thisPlugin,
+                thisEvent2,
+                maxTimeoutToExpectAResponse / 1000,
+                [typeToTest.data],
             );
             clearTimeout(emitTimeout);
             assert.fail("EEAR Returned");
-          } catch (exc) {
+          }
+          catch (exc) {
             clearTimeout(emitTimeout);
             assert.ok("Timeout of EEAR");
           }
@@ -340,14 +353,15 @@ export function emitAndReturn(
           });
           try {
             await emitter.emitEventAndReturn(
-              thisCaller,
-              thisEvent2,
-              maxTimeoutToExpectAResponse / 1000,
-              [typeToTest.data]
+                thisCaller,
+                thisEvent2,
+                maxTimeoutToExpectAResponse / 1000,
+                [typeToTest.data],
             );
             clearTimeout(emitTimeout);
             assert.fail("EEAR Returned");
-          } catch (exc) {
+          }
+          catch (exc) {
             clearTimeout(emitTimeout);
             assert.ok("Timeout of EEAR");
           }
@@ -360,20 +374,22 @@ export function emitAndReturn(
             assert.fail("Event not received");
           }, timermaxTimeoutToExpectAResponse + 10);
           await emitter.onReturnableEvent(
-            thisCaller,
-            thisEvent,
-            async () => {}
+              thisCaller,
+              thisEvent,
+              async () => {
+              },
           );
           try {
             await emitter.emitEventAndReturn(
-              thisCaller,
-              thisEvent,
-              maxTimeoutToExpectAResponse / 1000,
-              [typeToTest.data]
+                thisCaller,
+                thisEvent,
+                maxTimeoutToExpectAResponse / 1000,
+                [typeToTest.data],
             );
             clearTimeout(emitTimeout);
             assert.fail("EEAR Returned");
-          } catch (exc) {
+          }
+          catch (exc) {
             clearTimeout(emitTimeout);
             assert.ok("Timeout of EEAR");
           }
@@ -387,14 +403,15 @@ export function emitAndReturn(
           }, timermaxTimeoutToExpectAResponse + 10);
           try {
             await emitter.emitEventAndReturn(
-              thisCaller,
-              thisEvent,
-              maxTimeoutToExpectAResponse / 1000,
-              [typeToTest.data]
+                thisCaller,
+                thisEvent,
+                maxTimeoutToExpectAResponse / 1000,
+                [typeToTest.data],
             );
             clearTimeout(emitTimeout);
             assert.fail("EEAR Returned");
-          } catch (exc) {
+          }
+          catch (exc) {
             clearTimeout(emitTimeout);
             assert.ok("Timeout of EEAR");
           }
@@ -411,19 +428,20 @@ export function emitAndReturn(
           });
           try {
             await emitter.emitEventAndReturn(
-              thisCaller,
-              thisEvent,
-              maxTimeoutToExpectAResponse / 1000,
-              [typeToTest.data]
+                thisCaller,
+                thisEvent,
+                maxTimeoutToExpectAResponse / 1000,
+                [typeToTest.data],
             );
             clearTimeout(emitTimeout);
             assert.fail("EEAR Returned");
-          } catch (exc) {
+          }
+          catch (exc) {
             clearTimeout(emitTimeout);
             assert.ok("EEAR");
             assert.strictEqual(
-              JSON.stringify(exc),
-              JSON.stringify(typeToTest.rData || typeToTest.data)
+                JSON.stringify(exc),
+                JSON.stringify(typeToTest.rData || typeToTest.data),
             );
           }
         });

@@ -1,37 +1,43 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-  LoggingConfig,
-  EventsConfig,
-  PluginDefition,
-  PluginType,
-} from "../interfaces";
-import {
-  BaseWithLogging,
-  BaseWithLoggingConfig,
-  BSB_ERROR_METHOD_NOT_IMPLEMENTED,
-} from "./index";
-
-export interface BSBConfigConstructor extends BaseWithLoggingConfig {}
+import {EventsConfig, LoggingConfig, PluginDefinition, PluginType} from "../interfaces";
+import {BaseWithLogging, BaseWithLoggingConfig} from "./base";
+import {BSB_ERROR_METHOD_NOT_IMPLEMENTED} from "./errorMessages";
 
 /**
- * Abstract class representing the configuration for the Better Service Base.
- * @template T - The type of config for the plugin
+ * @hidden
  */
-export abstract class BSBConfig extends BaseWithLogging {
+export type BSBConfigConstructor = BaseWithLoggingConfig;
+
+/**
+ * @group Config
+ * @category Plugin Development
+ * @template T - The type of config for the plugin
+ * Abstract class representing the configuration for the Better Service Base.
+ */
+export abstract class BSBConfig
+    extends BaseWithLogging {
   constructor(config: BSBConfigConstructor) {
     super(config);
   }
+
   /**
    * This function is never used for events plugins.
    * @ignore @deprecated
    */
-  public run() {}
+  public run() {
+  }
 
   /**
    * Returns the logging plugins configuration.
    * @returns Promise resolving to an object containing the logging configuration for each plugin.
    */
   abstract getLoggingPlugins(): Promise<Record<string, LoggingConfig>>;
+
+  /**
+   * Returns the metrics plugins configuration.
+   * @returns Promise resolving to an object containing the metrics configuration for each plugin.
+   */
+  abstract getMetricsPlugins(): Promise<Record<string, PluginDefinition>>;
 
   /**
    * Returns the events plugins configuration.
@@ -43,14 +49,14 @@ export abstract class BSBConfig extends BaseWithLogging {
    * Returns the service plugins configuration.
    * @returns Promise resolving to an object containing the configuration for each plugin.
    */
-  abstract getServicePlugins(): Promise<Record<string, PluginDefition>>;
+  abstract getServicePlugins(): Promise<Record<string, PluginDefinition>>;
 
   /**
    * Returns a mapped plugin name and whether the plugin is enabled or not
    * @returns string of the plugin name and if it is enabled or not
    */
   abstract getServicePluginDefinition(
-    pluginName: string
+      pluginName: string,
   ): Promise<{ name: string; enabled: boolean }>;
 
   /**
@@ -60,38 +66,49 @@ export abstract class BSBConfig extends BaseWithLogging {
    * @returns Promise resolving to the configuration object for the specified plugin, or null if the plugin is not found.
    */
   abstract getPluginConfig(
-    pluginType: PluginType,
-    plugin: string
+      pluginType: PluginType,
+      plugin: string,
   ): Promise<object | null>;
 }
 
 /**
- * DO NOT REFERENCE/USE THIS CLASS - IT IS AN INTERNALLY REFERENCED CLASS
+ * @hidden
  */
-export class BSBConfigRef extends BSBConfig {
+export class BSBConfigRef
+    extends BSBConfig {
   getLoggingPlugins(): Promise<Record<string, LoggingConfig>> {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBConfigRef", "getLoggingPlugins");
   }
+
+  getMetricsPlugins(): Promise<Record<string, PluginDefinition>> {
+    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBConfigRef", "getMetricsPlugins");
+  }
+
   getEventsPlugins(): Promise<Record<string, EventsConfig>> {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBConfigRef", "getEventsPlugins");
   }
-  getServicePlugins(): Promise<Record<string, PluginDefition>> {
+
+  getServicePlugins(): Promise<Record<string, PluginDefinition>> {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBConfigRef", "getServicePlugins");
   }
+
   getPluginConfig(
-    pluginType: PluginType,
-    plugin: string
+      pluginType: PluginType,
+      plugin: string,
   ): Promise<object | null> {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBConfigRef", "getPluginConfig");
   }
+
   getServicePluginDefinition(
-    pluginName: string
+      pluginName: string,
   ): Promise<{ name: string; enabled: boolean }> {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED(
-      "BSBConfigRef",
-      "getServicePluginName"
+        "BSBConfigRef",
+        "getServicePluginName",
     );
   }
+
   dispose?(): void;
+
   init?(): void;
 }

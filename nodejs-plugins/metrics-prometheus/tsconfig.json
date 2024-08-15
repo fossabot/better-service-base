@@ -1,10 +1,16 @@
 {
   "compilerOptions": {
+    "lib": [
+      "ES2022"
+    ],
+    "module": "CommonJS",
+    "target": "ES2022",
     "baseUrl": ".",
     "paths": {
-      "*": ["types/*"]
+      "*": [
+        "types/*"
+      ]
     },
-    "module": "CommonJS",
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
@@ -14,32 +20,25 @@
     "outDir": "lib",
     "rootDir": "src",
     "strict": true,
-    "target": "es2022",
-    "lib": ["es2022"],
     "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "Node"
+    "forceConsistentCasingInFileNames": true
   },
   "linterOptions": {
     "exclude": [
-      "src/plugins/-*/**/*.*",
-      "src/tests/**/*.*"
+      "src/plugins/-*/**/*.*"
     ]
   },
   "compileOnSave": true,
   "include": [
-    "src",
-    "src/tests/sb/**/*.*"
+    "src"
   ],
   "exclude": [
     "node_modules/**",
     "src/plugins/*-test*/**/*.*",
-    "src/plugins/-*/**/*.*",
-    "src/plugins/service-*/**/*.*",
-    "src/tests/**/*.*"
+    "src/plugins/-*/**/*.*"
   ]
 }

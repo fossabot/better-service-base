@@ -1,5 +1,5 @@
-import { EventEmitter } from "events";
-import { IPluginLogger } from "../../../";
+import { EventEmitter } from "node:events";
+import { IPluginLogger } from "../../../index";
 
 export class broadcast extends EventEmitter {
   private log: IPluginLogger;

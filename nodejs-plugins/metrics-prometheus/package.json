@@ -1,0 +1,34 @@
+{
+  "name": "@bettercorp/service-base-plugins-metrics-prometheus",
+  "license": "AGPL-3.0-only",
+  "repository": {
+    "url": "git+https://github.com/BetterCorp/better-service-base.git"
+  },
+  "engines": {
+    "npm": ">=10.0.0",
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "rm -rfv ./lib && tsc",
+    "install-dev": "npm i && npm link ../../nodejs/"
+  },
+  "files": [
+    "lib/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "lib/index.js",
+  "version": "9.0.4-beta",
+  "devDependencies": {
+    "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.1",
+    "@typescript-eslint/parser": "^8.0.1",
+    "eslint": "^9.9.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@bettercorp/service-base": "9.0.4-beta",
+    "prom-client": "^15.1.3"
+  }
+}

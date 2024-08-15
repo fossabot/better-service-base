@@ -1,22 +1,22 @@
-import { DEBUG_MODE, IPluginLogger } from "../interfaces/logging";
-import { Plugin as DefaultConfig } from "../plugins/config-default/plugin";
-import { SBPlugins } from "./plugins";
-import { SBLogging } from "./logging";
-import { PluginLogger } from "../base/PluginLogger";
-import { BSBConfig } from "../base/config";
+import {BSBConfig, PluginLogger, SmartFunctionCallAsync, SmartFunctionCallSync, Tools} from "../base";
 import {
-  SmartFunctionCallSync,
-  SmartFunctionCallAsync,
-} from "../base/functions";
-import {
+  DEBUG_MODE,
   EventsConfig,
+  IPluginLogger,
   LoadedPlugin,
   LoggingConfig,
-  PluginDefition,
+  PluginDefinition,
   PluginType,
-} from "../interfaces/plugins";
-import { Tools } from "@bettercorp/tools/lib/Tools";
+} from "../interfaces";
+import {Plugin as DefaultConfig} from "../plugins/config-default/plugin";
+import {SBLogging} from "./logging";
+import {SBPlugins} from "./plugins";
 
+/**
+ * BSB Config Controller
+ * @group Config
+ * @category Extending BSB
+ */
 export class SBConfig {
   private mode: DEBUG_MODE = "development";
   private appId: string;
@@ -25,12 +25,13 @@ export class SBConfig {
   private sbLogging: SBLogging;
   private log: IPluginLogger;
   private configPlugin: BSBConfig;
+
   constructor(
-    appId: string,
-    mode: DEBUG_MODE,
-    cwd: string,
-    sbLogging: SBLogging,
-    sbPlugins: SBPlugins
+      appId: string,
+      mode: DEBUG_MODE,
+      cwd: string,
+      sbLogging: SBLogging,
+      sbPlugins: SBPlugins,
   ) {
     this.appId = appId;
     this.mode = mode;
@@ -52,20 +53,29 @@ export class SBConfig {
   public async getPluginConfig(pluginType: PluginType, name: string) {
     return await this.configPlugin.getPluginConfig(pluginType, name);
   }
-  public async getServicePlugins(): Promise<Record<string, PluginDefition>> {
+
+  public async getServicePlugins(): Promise<Record<string, PluginDefinition>> {
     return await this.configPlugin.getServicePlugins();
   }
+
   public async getEventsPlugins(): Promise<Record<string, EventsConfig>> {
     return await this.configPlugin.getEventsPlugins();
   }
+
   public async getLoggingPlugins(): Promise<Record<string, LoggingConfig>> {
     return await this.configPlugin.getLoggingPlugins();
   }
+
+  public async getMetricsPlugins(): Promise<Record<string, PluginDefinition>> {
+    return await this.configPlugin.getMetricsPlugins();
+  }
+
   public async getServicePluginDefinition(
-    pluginName: string
+      pluginName: string,
   ): Promise<{ name: string; enabled: boolean }> {
     return await this.configPlugin.getServicePluginDefinition(pluginName);
   }
+
   public dispose() {
     SmartFunctionCallSync(this.configPlugin, this.configPlugin.dispose);
   }
@@ -101,8 +111,8 @@ export class SBConfig {
 
   public async init(): Promise<void> {
     if (
-      Tools.isString(process.env.BSB_LOGGER_PLUGIN) &&
-      process.env.BSB_LOGGER_PLUGIN.startsWith("config-")
+        Tools.isString(process.env.BSB_LOGGER_PLUGIN) &&
+        process.env.BSB_LOGGER_PLUGIN.startsWith("config-")
     ) {
       this.configPluginName = process.env.BSB_LOGGER_PLUGIN;
       if (Tools.isString(process.env.BSB_LOGGER_PLUGIN_PACKAGE)) {
@@ -123,18 +133,18 @@ export class SBConfig {
     });
 
     const newPlugin = await this.sbPlugins.loadPlugin<"config">(
-      this.log,
-      this.configPackage ?? null,
-      this.configPluginName,
-      this.configPluginName
+        this.log,
+        this.configPackage ?? null,
+        this.configPluginName,
+        this.configPluginName,
     );
     if (newPlugin === null) {
       this.log.error(
-        "Failed to import config plugin: {name} from ({package})",
-        {
-          package: this.configPackage ?? "this project",
-          name: this.configPluginName,
-        }
+          "Failed to import config plugin: {name} from ({package})",
+          {
+            package: this.configPackage ?? "this project",
+            name: this.configPluginName,
+          }
       );
       return;
     }

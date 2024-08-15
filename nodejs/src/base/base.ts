@@ -1,7 +1,17 @@
-import { DEBUG_MODE, IPluginLogger } from "../interfaces";
-import { SBLogging } from "../serviceBase";
-import { BSBReferenceConfigType, PluginLogger } from "./index";
+import {DEBUG_MODE, IPluginLogger} from "../interfaces";
+import {SBLogging} from "../serviceBase";
+import {BSBReferenceConfigType} from "./pluginConfig";
+import {PluginLogger} from "./PluginLogger";
 
+/**
+ * Main base config
+ * @property appId - The unique app id of the app that is running
+ * @property mode - The mode the app is running in
+ * @property pluginName - The name of the plugin
+ * @property cwd - The current working directory of the app
+ * @property packageCwd - The directory of the package that contains the plugin
+ * @property pluginCwd - The directory of the plugin (src/plugins/{pluginName} or lib/plugins/{pluginName})
+ */
 export interface MainBaseConfig {
   appId: string;
   mode: DEBUG_MODE;
@@ -10,6 +20,10 @@ export interface MainBaseConfig {
   packageCwd: string;
   pluginCwd: string;
 }
+
+/**
+ * @hidden
+ */
 export abstract class MainBase {
   /**
    * The unique app id of the app that is running
@@ -48,7 +62,9 @@ export abstract class MainBase {
   constructor(config: MainBaseConfig) {
     this.appId = config.appId;
     this.mode = config.mode;
-    if (config.pluginName !== "") this.pluginName = config.pluginName;
+    if (config.pluginName !== "") {
+      this.pluginName = config.pluginName;
+    }
     this.cwd = config.cwd;
     this.packageCwd = config.packageCwd;
     this.pluginCwd = config.pluginCwd;
@@ -64,7 +80,11 @@ export abstract class MainBase {
   dispose?(): void;
 }
 
-export abstract class Base extends MainBase {
+/**
+ * @hidden
+ */
+export abstract class Base
+    extends MainBase {
   constructor(config: MainBaseConfig) {
     super(config);
   }
@@ -101,24 +121,35 @@ export abstract class Base extends MainBase {
   abstract run?(): Promise<void> | void;
 }
 
+/**
+ * @hidden
+ */
 export type ConfigPropertyTypeSafe<
-  ReferencedConfig extends BSBReferenceConfigType
+    ReferencedConfig extends BSBReferenceConfigType
 > = ReferencedConfig extends undefined
-  ? undefined
-  : ReferencedConfig extends null
-  ? undefined
-  : ReferencedConfig;
+    ? undefined
+    : ReferencedConfig extends null
+      ? undefined
+      : ReferencedConfig;
 
+/**
+ * @hidden
+ */
 export interface BaseWithConfigConfig<
-  ReferencedConfig extends BSBReferenceConfigType
-> extends MainBaseConfig {
+    ReferencedConfig extends BSBReferenceConfigType
+>
+    extends MainBaseConfig {
   config: ConfigPropertyTypeSafe<ReferencedConfig>;
 }
 
-// used by logging plugins (does not need events or logging since logging logs its own logs)
+/**
+ * @hidden
+ * used by logging plugins (does not need events or logging since logging logs its own logs)
+ */
 export abstract class BaseWithConfig<
-  ReferencedConfig extends BSBReferenceConfigType
-> extends Base {
+    ReferencedConfig extends BSBReferenceConfigType
+>
+    extends Base {
   /**
    * The config of the plugin
    * @type {PluginConfig}
@@ -132,50 +163,70 @@ export abstract class BaseWithConfig<
   }
 }
 
-export interface BaseWithLoggingConfig extends MainBaseConfig {
+/**
+ * BaseWithLoggingConfig
+ * @property sbLogging - Passed in logging base - can be used to create new plugin loggers
+ */
+export interface BaseWithLoggingConfig
+    extends MainBaseConfig {
   sbLogging: SBLogging;
 }
-// used by config plugins (does not need events)
-export abstract class BaseWithLogging extends Base {
+
+/**
+ * @hidden
+ * used by config plugins (does not need events)
+ */
+export abstract class BaseWithLogging
+    extends Base {
   protected log: IPluginLogger;
+
   //protected createNewLogger: { (plugin: string): IPluginLogger };
 
   constructor(config: BaseWithLoggingConfig) {
     super(config);
     this.log = new PluginLogger(
-      config.mode,
-      config.pluginName,
-      config.sbLogging
+        config.mode,
+        config.pluginName,
+        config.sbLogging,
     );
     /*this.createNewLogger = (plugin: string) =>
-      new PluginLogger(mode, `${pluginName}-${plugin}`, sbLogging);*/
+     new PluginLogger(mode, `${pluginName}-${plugin}`, sbLogging);*/
   }
 }
 
+/**
+ * @hidden
+ */
 export interface BaseWithLoggingAndConfigConfig<
-  ReferencedConfig extends BSBReferenceConfigType
-> extends BaseWithLoggingConfig,
-    BaseWithConfigConfig<ReferencedConfig> {}
+    ReferencedConfig extends BSBReferenceConfigType
+>
+    extends BaseWithLoggingConfig,
+            BaseWithConfigConfig<ReferencedConfig> {
+}
 
-// used by events plugins (does not need events)
+/**
+ * @hidden
+ * used by events plugins (does not need events)
+ */
 export abstract class BaseWithLoggingAndConfig<
-  ReferencedConfig extends BSBReferenceConfigType
-> extends BaseWithConfig<ReferencedConfig> {
+    ReferencedConfig extends BSBReferenceConfigType
+>
+    extends BaseWithConfig<ReferencedConfig> {
   protected log: IPluginLogger;
   protected createNewLogger: { (plugin: string): IPluginLogger };
 
   constructor(config: BaseWithLoggingAndConfigConfig<ReferencedConfig>) {
     super(config);
     this.log = new PluginLogger(
-      config.mode,
-      config.pluginName,
-      config.sbLogging
+        config.mode,
+        config.pluginName,
+        config.sbLogging,
     );
     this.createNewLogger = (plugin: string) =>
-      new PluginLogger(
-        config.mode,
-        `${config.pluginName}-${plugin}`,
-        config.sbLogging
-      );
+        new PluginLogger(
+            config.mode,
+            `${config.pluginName}-${plugin}`,
+            config.sbLogging,
+        );
   }
 }

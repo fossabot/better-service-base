@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { BSB_ERROR_METHOD_NOT_IMPLEMENTED } from "./index";
+import {z} from "zod";
+import {BSB_ERROR_METHOD_NOT_IMPLEMENTED} from "./errorMessages";
 
 /**
  * The definition of the config with zod validation
@@ -33,35 +33,38 @@ export type BSBPluginConfigDefinition = BSBPluginConfig<z.ZodTypeAny>;
  * return existingConfig;
  */
 export type BSBConfigMigration<T extends BSBPluginConfigType> = (
-  versionFrom: string | null,
-  versionTo: string,
-  existingConfig?: z.infer<Exclude<T, undefined>>
+    versionFrom: string | null,
+    versionTo: string,
+    existingConfig?: z.infer<Exclude<T, undefined>>,
 ) => Promise<z.infer<Exclude<T, undefined>>>;
 
 export type BSBConfigDefintionReference<
-  T extends BSBPluginConfigType,
-  AS = undefined
+    T extends BSBPluginConfigType,
+    AS = undefined
 > = T extends undefined ? AS : z.infer<Exclude<T, undefined>>;
 
 export type BSBReferenceConfigType = BSBPluginConfigType | null;
 export type BSBReferencePluginConfigType = BSBPluginConfigDefinition | null;
 export type BSBReferenceConfigDefinition<
-  ReferencedConfig extends BSBReferenceConfigType
+    ReferencedConfig extends BSBReferenceConfigType
 > = ReferencedConfig extends null ? null : ReferencedConfig;
 export type BSBReferencePluginConfigDefinition<
-  ReferencedConfig extends BSBReferencePluginConfigType
+    ReferencedConfig extends BSBReferencePluginConfigType
 > = ReferencedConfig extends null
-  ? null
-  : ReferencedConfig extends BSBPluginConfigDefinition
-  ? z.infer<ReferencedConfig["validationSchema"]>
-  : null;
+    ? null
+    : ReferencedConfig extends BSBPluginConfigDefinition
+      ? z.infer<ReferencedConfig["validationSchema"]>
+      : null;
 
 export abstract class BSBPluginConfig<
-  MyPluginConfig extends Exclude<BSBPluginConfigType, undefined> | null = null
+    MyPluginConfig extends Exclude<BSBPluginConfigType, undefined> | null = null
 > {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  constructor(cwd: string, packageCwd: string, pluginCwd: string, pluginName: string) {}
+  constructor(cwd: string, packageCwd: string, pluginCwd: string, pluginName: string) {
+  }
+
   public abstract validationSchema: MyPluginConfig;
+
   /**
    * Migrate the config from one version to another
    *
@@ -69,26 +72,28 @@ export abstract class BSBPluginConfig<
    * @todo write your migration code if you do make changes you'd like to have migratable
    */
   public abstract migrate?(
-    toVersion: string,
-    fromVersion: string | null,
-    fromConfig: any | null
+      toVersion: string,
+      fromVersion: string | null,
+      fromConfig: any | null,
   ): MyPluginConfig extends BSBPluginConfigType
-    ? z.infer<MyPluginConfig>
-    : null;
+     ? z.infer<MyPluginConfig>
+     : null;
 }
 
 /**
  * DO NOT REFERENCE/USE THIS CLASS - IT IS AN INTERNALLY REFERENCED CLASS
  */
-export class BSBPluginConfigRef extends BSBPluginConfig<any> {
+export class BSBPluginConfigRef
+    extends BSBPluginConfig<any> {
   public validationSchema = {};
+
   public migrate?(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    toVersion: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    fromVersion: string | null,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    fromConfig: any
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      toVersion: string,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      fromVersion: string | null,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      fromConfig: any,
   ) {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBPluginConfigRef", "migrate");
   }

@@ -1,21 +1,23 @@
-import { EventEmitter } from "events";
-import { IPluginLogger } from "../../../";
+import {EventEmitter} from "node:events";
+import {IPluginLogger} from "../../../index";
 
-export class emitAndReturn extends EventEmitter {
+export class emitAndReturn
+    extends EventEmitter {
   private log: IPluginLogger;
 
   constructor(log: IPluginLogger) {
     super();
     this.log = log;
   }
+
   public dispose() {
     this.removeAllListeners();
   }
 
   public async onReturnableEvent(
-    pluginName: string,
-    event: string,
-    listener: { (args: Array<any>): Promise<any> }
+      pluginName: string,
+      event: string,
+      listener: { (args: Array<any>): Promise<any> },
   ): Promise<void> {
     this.log.debug("onReturnableEvent: listening to {pluginName}-{event}", {
       pluginName,
@@ -24,17 +26,18 @@ export class emitAndReturn extends EventEmitter {
     this.on(`${pluginName}-${event}`, async (resolve, reject, data) => {
       try {
         resolve(await listener(data));
-      } catch (exc) {
+      }
+      catch (exc) {
         reject(exc);
       }
     });
   }
 
   public async emitEventAndReturn(
-    pluginName: string,
-    event: string,
-    timeoutSeconds: number,
-    args: Array<any>
+      pluginName: string,
+      event: string,
+      timeoutSeconds: number,
+      args: Array<any>,
   ): Promise<any> {
     this.log.debug("emitReturnableEvent: emitting {pluginName}-{event}", {
       pluginName,
@@ -46,16 +49,16 @@ export class emitAndReturn extends EventEmitter {
         reject("Timeout");
       }, timeoutSeconds * 1000);
       self.emit(
-        `${pluginName}-${event}`,
-        (args: any) => {
-          clearTimeout(timeoutHandler);
-          resolve(args);
-        },
-        (args: any) => {
-          clearTimeout(timeoutHandler);
-          reject(args);
-        },
-        args
+          `${pluginName}-${event}`,
+          (args: any) => {
+            clearTimeout(timeoutHandler);
+            resolve(args);
+          },
+          (args: any) => {
+            clearTimeout(timeoutHandler);
+            reject(args);
+          },
+          args,
       );
     });
   }

@@ -1,59 +1,60 @@
-import { LogFormatter } from "./index";
-import { LogMeta } from "../interfaces";
+import {LogMeta, ParamsFromString} from "../interfaces";
+import {LogFormatter} from "./logFormatter";
 
-export type EMetaDef<T extends string> = {
+/**
+ * @hidden
+ */
+export type ErrorLogMetaDefinition<T extends string> = {
   message: T;
   meta: LogMeta<T>;
 };
-export class BSBError<T extends string> extends Error {
-  constructor(errorKey: string, message: T, meta: LogMeta<T>);
-  constructor(message: T, meta: LogMeta<T>);
+export type ErrorLogMeta<T extends string> = ParamsFromString<T> extends never
+                                             ? [undefined?]
+                                             : [meta: LogMeta<T>];
+
+/**
+ * BSBError is a custom error class that allows for better error handling and logging
+ *
+ * @group Errors
+ * @category Tools
+ * @param message - The message to log
+ * @param meta - Additional information to log with the message
+ * @constructor
+ */
+export class BSBError<T extends string>
+    extends Error {
   constructor(
-    errorKeyOrMessage: string | T,
-    messageOrMeta: T | LogMeta<T>,
-    meta?: LogMeta<T>
+      message: T,
+      ...meta: ErrorLogMeta<T>
   ) {
     const formatter = new LogFormatter();
-    if (meta === undefined && typeof messageOrMeta === "object") {
-      super(formatter.formatLog(errorKeyOrMessage, messageOrMeta));
-      this.name = "BSBError-Generic";
-      this.raw = {
-        message: errorKeyOrMessage,
-        meta: messageOrMeta,
-      };
-    } else if (typeof messageOrMeta === "string" && typeof meta === "object") {
-      super(formatter.formatLog(messageOrMeta, meta));
-      this.name = "BSBError-" + errorKeyOrMessage;
-      this.raw = {
-        message: messageOrMeta,
-        meta: meta,
-      };
-    } else {
-      super(errorKeyOrMessage);
-      this.name = "BSBError-Generic";
-      this.raw = {
-        message: errorKeyOrMessage,
-        meta: messageOrMeta ?? {},
-      };
-    }
+    super(formatter.formatLog(message, ...meta));
+    this.name = "BSBError-" + message;
+    this.raw = {
+      message: message,
+      meta: meta,
+    };
   }
-  public raw: EMetaDef<string> | null = null;
+
+  public raw: ErrorLogMetaDefinition<string> | null = null;
 
   public toString(): string {
     return this.message;
   }
 }
 
+/**
+ * @hidden
+ */
 export function BSB_ERROR_METHOD_NOT_IMPLEMENTED(
-  className: string,
-  method: string
+    className: string,
+    method: string,
 ) {
   return new BSBError(
-    "INCORRECT_REFERENCE",
-    "Method not implemented: {class}.{method}",
-    {
-      class: className,
-      method: method,
-    }
+      "Method not implemented: {class}.{method}",
+      {
+        class: className,
+        method: method,
+      },
   );
 }

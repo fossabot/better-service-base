@@ -1,8 +1,8 @@
 import {
   LoggingConfig,
   EventsConfig,
-  PluginDefition as ServiceConfig,
-} from "../../";
+  PluginDefinition as ServiceConfig,
+} from "../../index";
 
 export interface DeploymentProfile {
   /**
@@ -65,6 +65,7 @@ export interface ExtendedConfig {
 }
 export interface ConfigProfile {
   logging: Record<PluginName, LoggingConfig & ExtendedConfig>;
+  metrics: Record<PluginName, ServiceConfig & ExtendedConfig>;
   events: Record<PluginName, EventsConfig & ExtendedConfig>;
   services: Record<PluginName, ServiceConfig & ExtendedConfig>;
 }

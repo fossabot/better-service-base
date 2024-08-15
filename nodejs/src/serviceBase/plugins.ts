@@ -1,15 +1,13 @@
-import { existsSync, readFileSync } from "fs";
-import { join } from "path";
-import {
-  PluginType,
-  PluginTypeDefinitionRef,
-  IPluginLogger,
-  BSBError,
-  LoadedPlugin,
-  BSBPluginConfig,
-  BSBPluginConfigRef,
-} from "../";
+import {existsSync, readFileSync} from "node:fs";
+import {join} from "node:path";
+import {BSBError, BSBPluginConfig, BSBPluginConfigRef} from "../base";
+import {IPluginLogger, LoadedPlugin, PluginType, PluginTypeDefinitionRef} from "../interfaces";
 
+/**
+ * BSB Plugins Controller
+ * @group Plugins
+ * @category Extending BSB
+ */
 export class SBPlugins {
   protected cwd: string;
   protected pluginDir: string;
@@ -19,23 +17,24 @@ export class SBPlugins {
     this.cwd = cwd;
     this.devMode = devMode;
     if (
-      typeof process.env.BSB_PLUGIN_DIR == "string" &&
-      process.env.BSB_PLUGIN_DIR.length > 3
+        typeof process.env.BSB_PLUGIN_DIR == "string" &&
+        process.env.BSB_PLUGIN_DIR.length > 3
     ) {
       this.pluginDir = process.env.BSB_PLUGIN_DIR;
-    } else {
+    }
+    else {
       this.pluginDir = join(this.cwd, "./node_modules/");
     }
   }
 
   public async loadPlugin<
-    NamedType extends PluginType,
-    ClassType extends PluginTypeDefinitionRef<NamedType> = PluginTypeDefinitionRef<NamedType>
+      NamedType extends PluginType,
+      ClassType extends PluginTypeDefinitionRef<NamedType> = PluginTypeDefinitionRef<NamedType>
   >(
-    log: IPluginLogger,
-    npmPackage: string | null,
-    plugin: string,
-    name: string
+      log: IPluginLogger,
+      npmPackage: string | null,
+      plugin: string,
+      name: string,
   ): Promise<LoadedPlugin<NamedType, ClassType> | null> {
     log.debug(`Plugin {name} from {package} try load as {pluginName}`, {
       name: plugin,
@@ -49,18 +48,22 @@ export class SBPlugins {
     if (!nodeModulesLib) {
       if (this.devMode) {
         pluginPath = join(this.cwd, "./src/plugins/" + plugin);
-        if (!existsSync(pluginPath)) pluginPath = "";
+        if (!existsSync(pluginPath)) {
+          pluginPath = "";
+        }
       }
       if (pluginPath == "") {
         pluginPath = join(this.cwd, "./lib/plugins/" + plugin);
       }
-    } else {
+    }
+    else {
       packageCwd = join(this.pluginDir, npmPackage);
       pluginPath = join(packageCwd, "./lib/plugins/", plugin);
 
       const packageJsonPath = join(packageCwd, "./package.json");
       const packageJSON = JSON.parse(
-        readFileSync(packageJsonPath, "utf-8").toString()
+          readFileSync(packageJsonPath, "utf-8")
+              .toString(),
       );
       version = packageJSON.version;
     }
@@ -89,29 +92,34 @@ export class SBPlugins {
       pluginFile = tsPluginFile;
     }
 
-    if (!existsSync(pluginFile))
+    if (!existsSync(pluginFile)) {
       throw new BSBError("Plugin {pluginName} not found at {location}", {
         pluginName: name,
         location: pluginFile,
       });
+    }
 
     const importedPlugin = await import(pluginFile);
 
-    if (importedPlugin.Plugin === undefined)
+    if (importedPlugin.Plugin === undefined) {
       throw new BSBError(
-        "Plugin {pluginName} does not export a Plugin class - so possibly not a valid BSB Plugin",
-        {
-          pluginName: name,
-        }
+          "Plugin {pluginName} does not export a Plugin class - so possibly not a valid BSB Plugin",
+          {
+            pluginName: name,
+          },
       );
-    if (importedPlugin.Config !== undefined)
+    }
+    if (importedPlugin.Config !== undefined) {
       serviceConfigDef =
-        new (importedPlugin.Config as typeof BSBPluginConfigRef)(
-          this.cwd,
-          packageCwd,
-          pluginPath,
-          name
-        );
+          new (
+              importedPlugin.Config as typeof BSBPluginConfigRef
+          )(
+              this.cwd,
+              packageCwd,
+              pluginPath,
+              name,
+          );
+    }
 
     return {
       name: name,

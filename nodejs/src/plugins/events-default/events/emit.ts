@@ -1,8 +1,9 @@
-import { EventEmitter } from "events";
-import { IPluginLogger } from "../../../";
-import { randomUUID } from "crypto";
+import {EventEmitter} from "node:events";
+import {IPluginLogger} from "../../../index";
+import {randomUUID} from "node:crypto";
 
-export class emit extends EventEmitter {
+export class emit
+    extends EventEmitter {
   private log: IPluginLogger;
   private _lastReceivedMessageIds: Array<string> = [];
   private set lastReceivedMessageIds(value: string) {
@@ -17,14 +18,15 @@ export class emit extends EventEmitter {
     super();
     this.log = log;
   }
+
   public dispose() {
     this.removeAllListeners();
   }
 
   public async onEvent(
-    pluginName: string,
-    event: string,
-    listener: { (args: Array<any>): Promise<void> }
+      pluginName: string,
+      event: string,
+      listener: { (args: Array<any>): Promise<void> },
   ): Promise<void> {
     this.log.debug("onEvent: listening to {pluginName}-{event}", {
       pluginName,
@@ -40,9 +42,9 @@ export class emit extends EventEmitter {
   }
 
   public async emitEvent(
-    pluginName: string,
-    event: string,
-    args: Array<any>
+      pluginName: string,
+      event: string,
+      args: Array<any>,
   ): Promise<void> {
     this.log.debug("emitEvent: emitting {pluginName}-{event}", {
       pluginName,

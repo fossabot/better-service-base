@@ -1,12 +1,12 @@
 import * as assert from "assert";
-import { randomUUID } from "crypto";
-import { BSBEvents, SmartFunctionCallSync } from "../../../..";
+import {randomUUID} from "crypto";
+import {BSBEvents, SmartFunctionCallSync} from "../../../../index";
 
 const randomName = () => randomUUID();
 
 export function emit(
-  genNewPlugin: { (): Promise<BSBEvents> },
-  maxTimeoutToExpectAResponse: number
+    genNewPlugin: { (): Promise<BSBEvents> },
+    maxTimeoutToExpectAResponse: number,
 ) {
   let emitter: BSBEvents;
   beforeEach(async () => {
@@ -26,8 +26,12 @@ export function emit(
         //console.log(emitter)
         let receiveCounter = 0;
         setTimeout(() => {
-          if (receiveCounter === 1) return assert.ok(receiveCounter);
-          if (receiveCounter === 0) return assert.fail("Event not received");
+          if (receiveCounter === 1) {
+            return assert.ok(receiveCounter);
+          }
+          if (receiveCounter === 0) {
+            return assert.fail("Event not received");
+          }
           assert.fail("Received " + receiveCounter + " events");
         }, maxTimeoutToExpectAResponse);
         await emitter.onEvent(thisPlugin, thisEvent, async () => {
@@ -45,8 +49,12 @@ export function emit(
         //console.log(emitter)
         let receiveCounter = 0;
         setTimeout(() => {
-          if (receiveCounter === 1) return assert.ok(receiveCounter);
-          if (receiveCounter === 0) return assert.fail("Event not received");
+          if (receiveCounter === 1) {
+            return assert.ok(receiveCounter);
+          }
+          if (receiveCounter === 0) {
+            return assert.fail("Event not received");
+          }
           assert.fail("Received " + receiveCounter + " events");
         }, maxTimeoutToExpectAResponse);
         await emitter.onEvent(thisPlugin, thisEvent, async () => {
@@ -102,7 +110,12 @@ export function emit(
           assert.deepEqual(data[2], 2);
           assert.deepEqual(data[3], 3);
         });
-        await emitter.emitEvent(thisCaller, thisEvent, [0, 1, 2, 3]);
+        await emitter.emitEvent(thisCaller, thisEvent, [
+          0,
+          1,
+          2,
+          3,
+        ]);
       });
       it("should not be able to emit to other events with plugin name defined", async () => {
         const thisPlugin = randomName();
@@ -223,7 +236,11 @@ export function emit(
       },
       {
         name: "Array",
-        data: [0, "Hello", true],
+        data: [
+          0,
+          "Hello",
+          true,
+        ],
       },
       {
         name: "Object",
@@ -232,12 +249,15 @@ export function emit(
           surname: "Blond",
           age: 24,
           meta: {
-            location: [-12212, 55336],
+            location: [
+              -12212,
+              55336,
+            ],
           },
         },
       },
     ];
-    for (const typeToTest of typesToTest)
+    for (const typeToTest of typesToTest) {
       describe(`emitEvent ${typeToTest.name}`, async () => {
         it("should be able to emit to events with plugin name defined", async () => {
           const thisPlugin = randomName();
@@ -298,5 +318,6 @@ export function emit(
           await emitter.emitEvent(thisCaller, thisEvent2, [typeToTest.data]);
         });
       });
+    }
   });
 }

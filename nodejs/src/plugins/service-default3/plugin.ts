@@ -1,28 +1,30 @@
-import { z } from "zod";
+import {z} from "zod";
 import {
   BSBPluginConfig,
   BSBPluginEvents,
   BSBService,
   BSBServiceConstructor,
   ServiceEventsBase,
-} from "../../";
-import { testClient } from "../service-default1";
+} from "../../index";
+import {testClient} from "../../plugins/service-default1/index";
 
 export const secSchema = z.object({});
 
-export class Config extends BSBPluginConfig<typeof secSchema> {
+export class Config
+    extends BSBPluginConfig<typeof secSchema> {
   validationSchema = secSchema;
 
   migrate(
-    toVersion: string,
-    fromVersion: string | null,
-    fromConfig: any | null
+      toVersion: string,
+      fromVersion: string | null,
+      fromConfig: any | null,
   ) {
     return fromConfig;
   }
 }
 
-export interface ServiceTypes extends BSBPluginEvents {
+export interface ServiceTypes
+    extends BSBPluginEvents {
   onEvents: ServiceEventsBase;
   emitEvents: ServiceEventsBase;
   onReturnableEvents: {
@@ -33,8 +35,9 @@ export interface ServiceTypes extends BSBPluginEvents {
   emitBroadcast: ServiceEventsBase;
 }
 
-export class Plugin extends BSBService<Config, ServiceTypes> {
-  public static PLUGIN_CLIENT = { name: "service-default3" };
+export class Plugin
+    extends BSBService<Config, ServiceTypes> {
+  public static PLUGIN_CLIENT = {name: "service-default3"};
   public initBeforePlugins?: string[] | undefined;
   public runBeforePlugins?: string[] | undefined;
   public runAfterPlugins?: string[] | undefined;
@@ -44,24 +47,31 @@ export class Plugin extends BSBService<Config, ServiceTypes> {
       return "test";
     },
   };
+
   dispose?(): void;
+
   public initAfterPlugins: string[] = ["service-default2"];
   private testClient: testClient;
+
   constructor(config: BSBServiceConstructor) {
     super(config);
     this.testClient = new testClient(this);
   }
+
   public async init() {
     await this.events.onReturnableEvent(
-      "onReverseReturnable",
-      async (tex: string) => {
-        this.log.warn("onReverseReturnable ({tex})", { tex });
-        return tex.split("").reverse().join("");
-      }
+        "onReverseReturnable",
+        async (tex: string) => {
+          this.log.warn("onReverseReturnable ({tex})", {tex});
+          return tex.split("")
+                    .reverse()
+                    .join("");
+        },
     );
   }
+
   public async run() {
     await this.testClient.abc(18, 19, 20, 21);
-    this.log.error("Error {a}", new Error("err"), { a: "b" });
+    this.log.error("Error {a}", {a: "b"});
   }
 }

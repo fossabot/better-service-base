@@ -1,14 +1,16 @@
-import { Readable } from "stream";
+import {Readable} from "node:stream";
 import {
   emit,
   broadcast,
   emitAndReturn,
   emitStreamAndReceiveStream,
-} from "./events";
-import { BSBEvents, BSBEventsConstructor } from "../../";
+} from "../../plugins/events-default/events/index";
+import {BSBEvents, BSBEventsConstructor} from "../../index";
 
-export class Plugin extends BSBEvents {
+export class Plugin
+    extends BSBEvents {
   init?(): void;
+
   protected broadcast!: broadcast;
   protected emit!: emit;
   protected ear!: emitAndReturn;
@@ -31,67 +33,71 @@ export class Plugin extends BSBEvents {
   }
 
   public async onBroadcast(
-    pluginName: string,
-    event: string,
-    listener: { (args: Array<any>): Promise<void> }
+      pluginName: string,
+      event: string,
+      listener: { (args: Array<any>): Promise<void> },
   ): Promise<void> {
     await this.broadcast.onBroadcast(pluginName, event, listener);
   }
+
   public async emitBroadcast(
-    pluginName: string,
-    event: string,
-    args: Array<any>
+      pluginName: string,
+      event: string,
+      args: Array<any>,
   ): Promise<void> {
     await this.broadcast.emitBroadcast(pluginName, event, args);
   }
 
   public async onEvent(
-    pluginName: string,
-    event: string,
-    listener: { (args: Array<any>): Promise<void> }
+      pluginName: string,
+      event: string,
+      listener: { (args: Array<any>): Promise<void> },
   ): Promise<void> {
     await this.emit.onEvent(pluginName, event, listener);
   }
+
   public async emitEvent(
-    pluginName: string,
-    event: string,
-    args: Array<any>
+      pluginName: string,
+      event: string,
+      args: Array<any>,
   ): Promise<void> {
     await this.emit.emitEvent(pluginName, event, args);
   }
 
   public async onReturnableEvent(
-    pluginName: string,
-    event: string,
-    listener: { (args: Array<any>): Promise<any> }
+      pluginName: string,
+      event: string,
+      listener: { (args: Array<any>): Promise<any> },
   ): Promise<void> {
     await this.ear.onReturnableEvent(pluginName, event, listener);
   }
+
   public async emitEventAndReturn(
-    pluginName: string,
-    event: string,
-    timeoutSeconds: number,
-    args: Array<any>
+      pluginName: string,
+      event: string,
+      timeoutSeconds: number,
+      args: Array<any>,
   ): Promise<any> {
     return await this.ear.emitEventAndReturn(
-      pluginName,
-      event,
-      timeoutSeconds,
-      args
+        pluginName,
+        event,
+        timeoutSeconds,
+        args,
     );
   }
 
   public async receiveStream(
-    event: string,
-    listener: { (error: Error | null, stream: Readable): Promise<void> },
-    timeoutSeconds?: number
+      event: string,
+      listener: { (error: Error | null, stream: Readable): Promise<void> },
+      timeoutSeconds?: number,
   ): Promise<string> {
     return this.eas.receiveStream(event, listener, timeoutSeconds);
   }
+
   public async sendStream(
-    event: string,
-    streamId: string,
-    stream: Readable
+      event: string,
+      streamId: string,
+      stream: Readable,
   ): Promise<void> {
     return this.eas.sendStream(event, streamId, stream);
   }

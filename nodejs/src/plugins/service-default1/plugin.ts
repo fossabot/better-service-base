@@ -1,6 +1,7 @@
-import { BSBService, BSBPluginEvents } from "../../";
+import {BSBService, BSBPluginEvents} from "../../index";
 
-export interface Events extends BSBPluginEvents {
+export interface Events
+    extends BSBPluginEvents {
   emitEvents: {
     onEmittable(a: number, b: number): Promise<void>;
   };
@@ -17,14 +18,15 @@ export interface Events extends BSBPluginEvents {
   onBroadcast: {};
 }
 
-export class Plugin extends BSBService<null, Events> {
+export class Plugin
+    extends BSBService<null, Events> {
   public initBeforePlugins?: string[] | undefined;
   public initAfterPlugins?: string[] | undefined;
   public runBeforePlugins?: string[] | undefined;
   public runAfterPlugins?: string[] | undefined;
   public methods = {
     callableMethod: async (a: number, b: number) => {
-      this.log.warn("callableMethod ({a},{b})", { a, b });
+      this.log.warn("callableMethod ({a},{b})", {a, b});
       this.events.emitEvent("onEmittable", a, b);
       return a * b;
     },
@@ -32,33 +34,36 @@ export class Plugin extends BSBService<null, Events> {
       return true;
     },
   };
+
   dispose?(): void;
+
   run?(): void | Promise<void>;
 
   private count = 0;
+
   public async init() {
     this.log.info("INIT SERVICE");
     this.events.onEvent("onReceivable", async (a: number, b: number) => {
       this.count++;
       console.log("calledI: " + this.count);
-      this.log.warn("received onReceivable ({a},{b}", { a, b });
+      this.log.warn("received onReceivable ({a},{b}", {a, b});
       //process.exit(3);
     });
     this.events.onReturnableEvent(
-      "onReturnable",
-      async (a: number, b: number) => {
-        this.log.warn("RECEIVED onReturnable ({a},{b})", { a, b });
-        const result = await this.events.emitEventAndReturn(
-          "onReverseReturnable",
-          5,
-          a,
-          b
-        );
-        this.log.warn("RETURNED onReverseReturnable ({result})", {
-          result,
-        });
-        return result;
-      }
+        "onReturnable",
+        async (a: number, b: number) => {
+          this.log.warn("RECEIVED onReturnable ({a},{b})", {a, b});
+          const result = await this.events.emitEventAndReturn(
+              "onReverseReturnable",
+              5,
+              a,
+              b,
+          );
+          this.log.warn("RETURNED onReverseReturnable ({result})", {
+            result,
+          });
+          return result;
+        },
     );
   }
 }

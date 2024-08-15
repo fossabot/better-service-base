@@ -1,14 +1,13 @@
-import { Readable } from "stream";
-import { DynamicallyReferencedMethodType } from "@bettercorp/tools/lib/Interfaces";
-import { BSBService, BSBServiceClient } from "./index";
+import {Readable} from "node:stream";
 import {
-  ServiceEventsBase,
-  DEBUG_MODE,
+  DEBUG_MODE, DynamicallyReferencedMethodEmitEARIEvents, DynamicallyReferencedMethodEmitIEvents,
   DynamicallyReferencedMethodOnIEvents,
-  DynamicallyReferencedMethodEmitIEvents,
-  DynamicallyReferencedMethodEmitEARIEvents,
+  DynamicallyReferencedMethodType,
+  ServiceEventsBase,
 } from "../interfaces";
-import { SBEvents } from "../serviceBase";
+import {SBEvents} from "../serviceBase";
+import {BSBService} from "./BSBService";
+import {BSBServiceClient} from "./BSBServiceClient";
 
 export abstract class BSBPluginEvents {
   public abstract onEvents: ServiceEventsBase;
@@ -20,23 +19,25 @@ export abstract class BSBPluginEvents {
 }
 
 export class PluginEvents<
-  onEvents = ServiceEventsBase,
-  emitEvents = ServiceEventsBase,
-  onReturnableEvents = ServiceEventsBase,
-  emitReturnableEvents = ServiceEventsBase,
-  onBroadcast = ServiceEventsBase,
-  emitBroadcast = ServiceEventsBase
+    onEvents = ServiceEventsBase,
+    emitEvents = ServiceEventsBase,
+    onReturnableEvents = ServiceEventsBase,
+    emitReturnableEvents = ServiceEventsBase,
+    onBroadcast = ServiceEventsBase,
+    emitBroadcast = ServiceEventsBase
 > {
   private events: SBEvents;
-  private service: BSBService | BSBServiceClient;
+  private service: BSBService<any, any> | BSBServiceClient<any>;
+
   constructor(
-    mode: DEBUG_MODE,
-    events: SBEvents,
-    context: BSBService | BSBServiceClient
+      mode: DEBUG_MODE,
+      events: SBEvents,
+      context: BSBService | BSBServiceClient,
   ) {
     this.events = events;
     this.service = context;
   }
+
   /**
    * Listens for events that are emitted by other plugins
    * Broadcast events are emitted and received by all plugins
@@ -58,20 +59,21 @@ export class PluginEvents<
    * ```
    */
   public async onBroadcast<TA extends keyof onBroadcast>(
-    ...args: DynamicallyReferencedMethodOnIEvents<
-      DynamicallyReferencedMethodType<onBroadcast>,
-      TA,
-      false
-    >
+      ...args: DynamicallyReferencedMethodOnIEvents<
+          DynamicallyReferencedMethodType<onBroadcast>,
+          TA,
+          false
+      >
   ): Promise<void> {
     const event = args.splice(0, 1)[0] as string;
     await this.events.onBroadcast(
-      this.service,
-      this.service.pluginName,
-      event,
-      args[0] as unknown as (...args: any[]) => void | Promise<void>
+        this.service,
+        this.service.pluginName,
+        event,
+        args[0] as unknown as (...args: any[]) => void | Promise<void>,
     );
   }
+
   /**
    * Emits a broadcast event that is received by all plugins that are listening for that event
    *
@@ -91,10 +93,10 @@ export class PluginEvents<
    * });
    */
   async emitBroadcast<TA extends keyof emitBroadcast>(
-    ...args: DynamicallyReferencedMethodEmitIEvents<
-      DynamicallyReferencedMethodType<emitBroadcast>,
-      TA
-    >
+      ...args: DynamicallyReferencedMethodEmitIEvents<
+          DynamicallyReferencedMethodType<emitBroadcast>,
+          TA
+      >
   ): Promise<void> {
     const event = args.splice(0, 1)[0] as string;
     await this.events.emitBroadcast(this.service.pluginName, event, ...args);
@@ -119,20 +121,21 @@ export class PluginEvents<
    * });
    */
   public async onEvent<TA extends keyof onEvents>(
-    ...args: DynamicallyReferencedMethodOnIEvents<
-      DynamicallyReferencedMethodType<onEvents>,
-      TA,
-      false
-    >
+      ...args: DynamicallyReferencedMethodOnIEvents<
+          DynamicallyReferencedMethodType<onEvents>,
+          TA,
+          false
+      >
   ): Promise<void> {
     const event = args.splice(0, 1)[0] as string;
     await this.events.onEvent(
-      this.service,
-      this.service.pluginName,
-      event,
-      args[0] as unknown as (...args: any[]) => void | Promise<void>
+        this.service,
+        this.service.pluginName,
+        event,
+        args[0] as unknown as (...args: any[]) => void | Promise<void>,
     );
   }
+
   /**
    * Emits an event that is received by the first plugin that is listening for that event (depends on events service)
    *
@@ -152,10 +155,10 @@ export class PluginEvents<
    * });
    */
   public async emitEvent<TA extends keyof emitEvents>(
-    ...args: DynamicallyReferencedMethodEmitIEvents<
-      DynamicallyReferencedMethodType<emitEvents>,
-      TA
-    >
+      ...args: DynamicallyReferencedMethodEmitIEvents<
+          DynamicallyReferencedMethodType<emitEvents>,
+          TA
+      >
   ): Promise<void> {
     const event = args.splice(0, 1)[0] as string;
     await this.events.emitEvent(this.service.pluginName, event, ...args);
@@ -182,22 +185,23 @@ export class PluginEvents<
    * });
    */
   public async onEventSpecific<TA extends keyof onEvents>(
-    serverId: string,
-    ...args: DynamicallyReferencedMethodOnIEvents<
-      DynamicallyReferencedMethodType<onEvents>,
-      TA,
-      false
-    >
+      serverId: string,
+      ...args: DynamicallyReferencedMethodOnIEvents<
+          DynamicallyReferencedMethodType<onEvents>,
+          TA,
+          false
+      >
   ): Promise<void> {
     const event = args.splice(0, 1)[0] as string;
     await this.events.onEventSpecific(
-      serverId,
-      this.service,
-      this.service.pluginName,
-      event,
-      args[0] as unknown as (...args: any[]) => void | Promise<void>
+        serverId,
+        this.service,
+        this.service.pluginName,
+        event,
+        args[0] as unknown as (...args: any[]) => void | Promise<void>,
     );
   }
+
   /**
    * Emits an event that is received by the first plugin that is listening for that event (depends on events service)
    * The serverId allows for the event to be handled by a specific plugin
@@ -219,18 +223,18 @@ export class PluginEvents<
    * });
    */
   public async emitEventSpecific<TA extends keyof emitEvents>(
-    serverId: string,
-    ...args: DynamicallyReferencedMethodEmitIEvents<
-      DynamicallyReferencedMethodType<emitEvents>,
-      TA
-    >
+      serverId: string,
+      ...args: DynamicallyReferencedMethodEmitIEvents<
+          DynamicallyReferencedMethodType<emitEvents>,
+          TA
+      >
   ): Promise<void> {
     const event = args.splice(0, 1)[0] as string;
     await this.events.emitEventSpecific(
-      serverId,
-      this.service.pluginName,
-      event,
-      ...args
+        serverId,
+        this.service.pluginName,
+        event,
+        ...args,
     );
   }
 
@@ -255,20 +259,21 @@ export class PluginEvents<
    * });
    */
   public async onReturnableEvent<TA extends keyof onReturnableEvents>(
-    ...args: DynamicallyReferencedMethodOnIEvents<
-      DynamicallyReferencedMethodType<onReturnableEvents>,
-      TA,
-      true
-    >
+      ...args: DynamicallyReferencedMethodOnIEvents<
+          DynamicallyReferencedMethodType<onReturnableEvents>,
+          TA,
+          true
+      >
   ): Promise<void> {
     const event = args.splice(0, 1)[0] as string;
     return await this.events.onReturnableEvent(
-      this.service,
-      this.service.pluginName,
-      event,
-      args[0] as unknown as (...args: any[]) => void | Promise<void>
+        this.service,
+        this.service.pluginName,
+        event,
+        args[0] as unknown as (...args: any[]) => void | Promise<void>,
     );
   }
+
   /**
    * Emits a returnable event that is received by the first plugin that is listening for that event (depends on events service)
    *
@@ -289,27 +294,29 @@ export class PluginEvents<
    * });
    */
   public async emitEventAndReturn<TA extends keyof emitReturnableEvents>(
-    ...args: DynamicallyReferencedMethodEmitEARIEvents<
-      DynamicallyReferencedMethodType<emitReturnableEvents>,
-      TA,
-      true //,
-      //false
-    >
+      ...args: DynamicallyReferencedMethodEmitEARIEvents<
+          DynamicallyReferencedMethodType<emitReturnableEvents>,
+          TA,
+          true //,
+          //false
+      >
   ): Promise<
-    DynamicallyReferencedMethodEmitEARIEvents<
-      DynamicallyReferencedMethodType<emitReturnableEvents>,
-      TA,
-      false
-    >
+      DynamicallyReferencedMethodEmitEARIEvents<
+          DynamicallyReferencedMethodType<emitReturnableEvents>,
+          TA,
+          false
+      >
   > {
     const event = args.splice(0, 1)[0] as string;
     const timeoutSeconds =
-      args.length > 0 ? (args.splice(0, 1)[0] as number) : 5;
+              args.length > 0 ? (
+                  args.splice(0, 1)[0] as number
+              ) : 5;
     return await this.events.emitEventAndReturn(
-      this.service.pluginName,
-      event,
-      timeoutSeconds,
-      ...args
+        this.service.pluginName,
+        event,
+        timeoutSeconds,
+        ...args,
     );
   }
 
@@ -335,22 +342,23 @@ export class PluginEvents<
    * });
    */
   public async onReturnableEventSpecific<TA extends keyof onReturnableEvents>(
-    serverId: string,
-    ...args: DynamicallyReferencedMethodOnIEvents<
-      DynamicallyReferencedMethodType<onReturnableEvents>,
-      TA,
-      true
-    >
+      serverId: string,
+      ...args: DynamicallyReferencedMethodOnIEvents<
+          DynamicallyReferencedMethodType<onReturnableEvents>,
+          TA,
+          true
+      >
   ): Promise<void> {
     const event = args.splice(0, 1)[0] as string;
     return await this.events.onReturnableEventSpecific(
-      serverId,
-      this.service,
-      this.service.pluginName,
-      event,
-      args[0] as unknown as (...args: any[]) => void | Promise<void>
+        serverId,
+        this.service,
+        this.service.pluginName,
+        event,
+        args[0] as unknown as (...args: any[]) => void | Promise<void>,
     );
   }
+
   /**
    * Emits a returnable event that is received by the first plugin that is listening for that event (depends on events service)
    * The serverId allows for the event to be handled by a specific plugin
@@ -373,31 +381,33 @@ export class PluginEvents<
    * });
    */
   public async emitEventAndReturnSpecific<
-    TA extends keyof emitReturnableEvents
+      TA extends keyof emitReturnableEvents
   >(
-    serverId: string,
-    ...args: DynamicallyReferencedMethodEmitEARIEvents<
-      DynamicallyReferencedMethodType<emitReturnableEvents>,
-      TA,
-      true /*,
-      false*/
-    >
+      serverId: string,
+      ...args: DynamicallyReferencedMethodEmitEARIEvents<
+          DynamicallyReferencedMethodType<emitReturnableEvents>,
+          TA,
+          true /*,
+       false*/
+      >
   ): Promise<
-    DynamicallyReferencedMethodEmitEARIEvents<
-      DynamicallyReferencedMethodType<emitReturnableEvents>,
-      TA,
-      false
-    >
+      DynamicallyReferencedMethodEmitEARIEvents<
+          DynamicallyReferencedMethodType<emitReturnableEvents>,
+          TA,
+          false
+      >
   > {
     const event = args.splice(0, 1)[0] as string;
     const timeoutSeconds =
-      args.length > 0 ? (args.splice(0, 1)[0] as number) : 5;
+              args.length > 0 ? (
+                  args.splice(0, 1)[0] as number
+              ) : 5;
     return await this.events.emitEventAndReturnSpecific(
-      serverId,
-      this.service.pluginName,
-      event,
-      timeoutSeconds,
-      ...args
+        serverId,
+        this.service.pluginName,
+        event,
+        timeoutSeconds,
+        ...args,
     );
   }
 
@@ -430,16 +440,16 @@ export class PluginEvents<
    * ```
    */
   public async receiveStream(
-    event: string,
-    listener: { (error: Error | null, stream: Readable): Promise<void> },
-    timeoutSeconds?: number
+      event: string,
+      listener: { (error: Error | null, stream: Readable): Promise<void> },
+      timeoutSeconds?: number,
   ): Promise<string> {
     return await this.events.receiveStream(
-      this.service,
-      this.service.pluginName,
-      event,
-      listener,
-      timeoutSeconds
+        this.service,
+        this.service.pluginName,
+        event,
+        listener,
+        timeoutSeconds,
     );
   }
 
@@ -472,15 +482,15 @@ export class PluginEvents<
    * ```
    */
   public async sendStream(
-    event: string,
-    streamId: string,
-    stream: Readable
+      event: string,
+      streamId: string,
+      stream: Readable,
   ): Promise<void> {
     return await this.events.sendStream(
-      this.service.pluginName,
-      event,
-      streamId,
-      stream
+        this.service.pluginName,
+        event,
+        streamId,
+        stream,
     );
   }
 }
@@ -488,7 +498,8 @@ export class PluginEvents<
 /**
  * DO NOT REFERENCE/USE THIS CLASS - IT IS AN INTERNALLY REFERENCED CLASS
  */
-export class BSBPluginEventsRef extends BSBPluginEvents {
+export class BSBPluginEventsRef
+    extends BSBPluginEvents {
   public onEvents: ServiceEventsBase = {};
   public emitEvents: ServiceEventsBase = {};
   public onReturnableEvents: ServiceEventsBase = {};

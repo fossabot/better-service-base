@@ -1,18 +1,20 @@
-import { BSBService, BSBServiceConstructor, BSBPluginConfig } from "../../";
-import { testClient } from "../service-default1";
-import { z } from "zod";
+import {BSBPluginConfig, BSBService, BSBServiceConstructor} from "../../base";
+import {testClient} from "../../plugins/service-default1/index";
+import {z} from "zod";
 
 export const secSchema = z.object({
   testa: z.number(),
   testb: z.number(),
 });
-export class Config extends BSBPluginConfig<typeof secSchema> {
+
+export class Config
+    extends BSBPluginConfig<typeof secSchema> {
   validationSchema = secSchema;
 
   migrate(
-    toVersion: string,
-    fromVersion: string | null,
-    fromConfig: any | null
+      toVersion: string,
+      fromVersion: string | null,
+      fromConfig: any | null,
   ) {
     if (fromConfig === null) {
       // defaults
@@ -20,7 +22,8 @@ export class Config extends BSBPluginConfig<typeof secSchema> {
         testa: 1,
         testb: 2,
       };
-    } else {
+    }
+    else {
       // migrate
       return {
         testa: fromConfig.testa,
@@ -41,32 +44,47 @@ export interface Events {
   onBroadcast: {};
 }
 
-export class Plugin extends BSBService<Config, Events> {
+export class Plugin
+    extends BSBService<Config, Events> {
   public initBeforePlugins?: string[] | undefined;
   //public initAfterPlugins: string[] = ["service-default3"];
   public initAfterPlugins?: string[] | undefined;
   public runBeforePlugins?: string[] | undefined;
   public runAfterPlugins?: string[] | undefined;
+
   public init?(): Promise<void>;
+
   public dispose?(): void;
+
   public readonly methods = {
     abc: async () => {
       console.log("abc called");
     },
   };
   private testClient: testClient;
+
   constructor(config: BSBServiceConstructor) {
     super(config);
     this.testClient = new testClient(this);
   }
+
   public async run() {
     this.log.info("aa");
     this.events.emitEvent("test", "test", "test");
     await this.testClient.abc(
-      this.config.testa,
-      this.config.testb,
-      this.config.testa,
-      this.config.testb
+        this.config.testa,
+        this.config.testb,
+        this.config.testa,
+        this.config.testb,
     );
+
+    setTimeout(() => {
+      const trace = this.metrics.createTrace();
+      const span = trace.createSpan("test-span");
+      console.log("abc called");
+      span.end();
+      trace.end();
+      console.log(trace);
+    }, 5000);
   }
 }

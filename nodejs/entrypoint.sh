@@ -7,15 +7,15 @@
 #   # node ./node_modules/@bettercorp/service-base/postinstall.js --cwd=$(pwd)
 # fi
 
-mkdir /home/bsb/.temp
+mkdir /mnt/.temp
 
-chown -R node:node /home/bsb
-chown -R node:node /mnt/bsb-plugins
+chown -R bsb:bsb /home/bsb
+chown -R bsb:bsb /mnt/plugins
 
-chmod -R 444 /home/bsb
-chmod -R 644 /home/bsb/.temp
-chmod -R 444 /mnt/bsb-plugins
-chmod 600 /home/bsb/sec-config.yaml
+chmod -R 440 /home/bsb
+chmod -R 640 /home/bsb/.temp
+chmod -R 440 /mnt/plugins
+chmod 400 /home/bsb/sec-config.yaml
 
 # Check if the first argument is BSBDEBUG for debugging purposes
 if [ "$1" = "BSBDEBUG" ]; then
