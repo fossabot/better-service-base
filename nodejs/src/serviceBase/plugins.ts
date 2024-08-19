@@ -81,10 +81,10 @@ export class SBPlugins {
       pluginName: name,
     });
 
-    let pluginFile = join(pluginPath, "./plugin.js");
+    let pluginFile = join(pluginPath, "./index.js");
     let serviceConfigDef: BSBPluginConfig<any> | null = null;
     //if (this.devMode) {
-    const tsPluginFile = join(pluginPath, "./plugin.ts");
+    const tsPluginFile = join(pluginPath, "./index.ts");
     if (existsSync(tsPluginFile)) {
       log.debug("Plugin {pluginName} running in development mode", {
         pluginName: name,
