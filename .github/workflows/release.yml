@@ -16,6 +16,7 @@ jobs:
     with:
       PUBLISH: true
       WORKING_DIR: ./nodejs
+      LINT: false
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       NPM_PUBLISH_TOKEN: ${{ secrets.NPM2_TOKEN_PUB }}
