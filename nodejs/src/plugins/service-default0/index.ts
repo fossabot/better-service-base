@@ -1,5 +1,5 @@
-import {BSBPluginConfig, BSBService, BSBServiceConstructor} from "../../base";
-import {testClient} from "../../plugins/service-default1/index";
+import {BSBPluginConfig, BSBService, BSBServiceConstructor, ServiceClient} from "../../base";
+import {Plugin as Default1Plugin} from "../../plugins/service-default1/index";
 import {z} from "zod";
 
 export const secSchema = z.object({
@@ -57,23 +57,21 @@ export class Plugin
   public dispose?(): void;
 
   public readonly methods = {
-    abc: async () => {
-      console.log("abc called");
+    abc: async (...numbers: Array<number>) => {
+      this.log.info("abc called: {numbers}", {numbers});
     },
   };
-  private testClient: testClient;
+  private testClient: ServiceClient<Default1Plugin>;
 
   constructor(config: BSBServiceConstructor) {
     super(config);
-    this.testClient = new testClient(this);
+    this.testClient = new ServiceClient(Default1Plugin, this);
   }
 
   public async run() {
     this.log.info("aa");
     this.events.emitEvent("test", "test", "test");
-    await this.testClient.abc(
-        this.config.testa,
-        this.config.testb,
+    await this.testClient.callMethod('callableMethod',
         this.config.testa,
         this.config.testb,
     );

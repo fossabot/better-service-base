@@ -3,10 +3,10 @@ import {
   BSBPluginConfig,
   BSBPluginEvents,
   BSBService,
-  BSBServiceConstructor,
+  BSBServiceConstructor, ServiceClient,
   ServiceEventsBase,
 } from "../../index";
-import {testClient} from "../../plugins/service-default1/index";
+import {Plugin as Default0Plugin} from "../../plugins/service-default0/index";
 
 export const secSchema = z.object({});
 
@@ -51,11 +51,11 @@ export class Plugin
   dispose?(): void;
 
   public initAfterPlugins: string[] = ["service-default2"];
-  private testClient: testClient;
+  private testClient: ServiceClient<Default0Plugin>;
 
   constructor(config: BSBServiceConstructor) {
     super(config);
-    this.testClient = new testClient(this);
+    this.testClient = new ServiceClient<Default0Plugin>(Default0Plugin, this);
   }
 
   public async init() {
@@ -71,7 +71,7 @@ export class Plugin
   }
 
   public async run() {
-    await this.testClient.abc(18, 19, 20, 21);
+    await this.testClient.callMethod("abc", 18, 19, 20, 21);
     this.log.error("Error {a}", {a: "b"});
   }
 }

@@ -1,50 +1,65 @@
-import {BSBServiceClient} from "../../index";
-import {Plugin} from "./plugin";
+import {BSBService, BSBPluginEvents} from "../../index";
 
-export class testClient
-    extends BSBServiceClient<Plugin> {
+export interface Events
+    extends BSBPluginEvents {
+  emitEvents: {
+    onEmittable(a: number, b: number): Promise<void>;
+  };
+  onEvents: {
+    onReceivable(a: number, b: number): Promise<void>;
+  };
+  emitReturnableEvents: {
+    onReverseReturnable(a: number, b: number): Promise<number>;
+  };
+  onReturnableEvents: {
+    onReturnable(a: number, b: number): Promise<number>;
+  };
+  emitBroadcast: {};
+  onBroadcast: {};
+}
+
+export class Plugin
+    extends BSBService<null, Events> {
   public initBeforePlugins?: string[] | undefined;
   public initAfterPlugins?: string[] | undefined;
   public runBeforePlugins?: string[] | undefined;
   public runAfterPlugins?: string[] | undefined;
+  public methods = {
+    callableMethod: async (a: number, b: number) => {
+      this.log.warn("callableMethod ({a},{b})", {a, b});
+      this.events.emitEvent("onEmittable", a, b);
+      return a * b;
+    },
+    testMethod: (): boolean => {
+      return true;
+    },
+  };
 
-  public dispose?(): void;
+  dispose?(): void;
 
-  public run?(): Promise<void>;
+  run?(): void | Promise<void>;
 
-  public readonly pluginName: string = "service-default1";
-  private count = 0;
-
-  public async init(): Promise<void> {
-    const metric = this.metrics.createGauge("test-gauge");
-    let c = 0;
-    setInterval(() => {
-      metric.set(c++);
-    }, 1000);
-    await this.events.onEvent("onEmittable", async (a: number, b: number) => {
-      this.log.warn("onEmittable ({a},{b})", {a, b});
+  public async init() {
+    this.log.info("INIT SERVICE");
+    this.events.onEvent("onReceivable", async (a: number, b: number) => {
+      this.log.warn("received onReceivable ({a},{b}", {a, b});
+      //process.exit(3);
     });
-    await this.events.onReturnableEvent(
-        "onReverseReturnable",
+    this.events.onReturnableEvent(
+        "onReturnable",
         async (a: number, b: number) => {
-          this.count++;
-          console.log("called: " + this.count);
-          this.log.warn("onReverseReturnable ({a},{b})", {a, b});
-          return a * b;
+          this.log.warn("RECEIVED onReturnable ({a},{b})", {a, b});
+          const result = await this.events.emitEventAndReturn(
+              "onReverseReturnable",
+              5,
+              a,
+              b,
+          );
+          this.log.warn("RETURNED onReverseReturnable ({result})", {
+            result,
+          });
+          return result;
         },
     );
-    await this.events.emitEvent("onReceivable", 56, 7);
-  }
-
-  async abc(a: number, b: number, c: number, d: number): Promise<void> {
-    this.log.warn("TESTING ABC CALL ({result})", {
-      result: await this.callMethod("callableMethod", a, b),
-    });
-    this.log.warn("TESTING NON ASYNC CALL ({result})", {
-      result: this.callMethod("testMethod"),
-    });
-    this.log.warn("TESTING onReturnable ({result})", {
-      result: await this.events.emitEventAndReturn("onReturnable", 5, c, d),
-    });
   }
 }

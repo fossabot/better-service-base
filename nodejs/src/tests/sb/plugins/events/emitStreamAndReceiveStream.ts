@@ -118,7 +118,7 @@ export function emitStreamAndReceiveStream(
         await emitter.sendStream(thisCaller, thisEvent, mockBareFakeStream());
         assert.fail("Timeout not called");
       }
-      catch (xc) {
+      catch {
         assert.ok(true, "Timeout called exception");
       }
     });
@@ -142,7 +142,7 @@ export function emitStreamAndReceiveStream(
         console.log("endededed");
         // eslint-disable-next-line no-empty
       }
-      catch (xx) {
+      catch {
       }
     });
     describe("sendStream triggers receiveStream listener passing in the stream", async () => {
@@ -165,7 +165,7 @@ export function emitStreamAndReceiveStream(
           await emitter.sendStream(thisCaller, uuid, mockBareFakeStream());
           // eslint-disable-next-line no-empty
         }
-        catch (xx) {
+        catch {
         }
       });
       it("should call the listener with a stream", async () => {
@@ -191,7 +191,7 @@ export function emitStreamAndReceiveStream(
           await emitter.sendStream(thisCaller, uuid, mockBareFakeStream());
           // eslint-disable-next-line no-empty
         }
-        catch (xx) {
+        catch {
         }
       });
     });

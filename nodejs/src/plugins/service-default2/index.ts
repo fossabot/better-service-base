@@ -1,5 +1,5 @@
-import {BSBService, BSBServiceConstructor} from "../../index";
-import {testClient} from "../../plugins/service-default1/index";
+import {BSBService, BSBServiceConstructor, ServiceClient} from "../../index";
+import {Plugin as Default0Plugin} from "../../plugins/service-default0/index";
 
 export class Plugin
     extends BSBService<null> {
@@ -13,14 +13,14 @@ export class Plugin
   init?(): void | Promise<void>;
 
   public initAfterPlugins: string[] = ["service-default1"];
-  private testClient: testClient;
+  private testClient: ServiceClient<Default0Plugin>;
 
   constructor(config: BSBServiceConstructor) {
     super(config);
-    this.testClient = new testClient(this);
+    this.testClient = new ServiceClient(Default0Plugin, this);
   }
 
   public async run() {
-    await this.testClient.abc(10, 12, 11, 13);
+    await this.testClient.callMethod('abc', 10, 12, 11, 13);
   }
 }

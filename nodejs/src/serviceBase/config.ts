@@ -8,7 +8,7 @@ import {
   PluginDefinition,
   PluginType,
 } from "../interfaces";
-import {Plugin as DefaultConfig} from "../plugins/config-default/plugin";
+import {Plugin as DefaultConfig} from "../plugins/config-default/index";
 import {SBLogging} from "./logging";
 import {SBPlugins} from "./plugins";
 

@@ -17,7 +17,7 @@ import {
   IPluginLogger,
   IPluginMetrics, LoadedPlugin,
 } from "../interfaces";
-import {Plugin as DefaultEvents} from "../plugins/events-default/plugin";
+import {Plugin as DefaultEvents} from "../plugins/events-default/index";
 import {SBConfig} from "./config";
 import {SBLogging} from "./logging";
 import {SBMetrics} from "./metrics";

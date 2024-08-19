@@ -3,7 +3,7 @@ import {
   Plugin,
   LOG_LEVELS,
   LogLevels,
-} from "../../../plugins/logging-default/plugin";
+} from "../../../plugins/logging-default/index";
 import {BSBLoggingConstructor, DEBUG_MODE} from "../../../index";
 
 const getLoggingConstructorConfig = (
@@ -298,7 +298,7 @@ describe("plugins/logging-default", () => {
       storeConsole("error", undefined, [
         "test-error",
         "An error while stacking",
-        "src/tests/plugins/logging-default/plugin.ts:",
+        "src/tests/plugins/logging-default/index.ts:",
       ]);
       plugin.error(
           "infW-DbG",

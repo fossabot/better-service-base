@@ -1,5 +1,5 @@
 import {BSBService, BSBServiceConstructor, ServiceClient} from "../../index";
-import {Plugin as S3Plugin} from "../service-default3/plugin";
+import {Plugin as S3Plugin} from "../service-default3/index";
 
 export class Plugin
     extends BSBService<null> {
