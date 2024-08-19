@@ -1,10 +1,16 @@
 default:
-  logging:
-  events:
-    rabbit:
-      plugin: events-rabbitMQ
-      package: "@bettercorp/bsb-rabbitmq"
+  metrics:
+    metrics-default:
+      plugin: metrics-default
       enabled: false
+  logging:
+    logging-default:
+      plugin: logging-default
+      enabled: true
+  events:
+    events-default:
+      plugin: events-default
+      enabled: true
   services:
     service-default0X:
       plugin: service-default0

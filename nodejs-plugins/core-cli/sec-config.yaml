@@ -1,0 +1,14 @@
+default:
+  metrics:
+  logging:
+  events:
+  services:
+    service-bsb-init:
+      plugin: service-bsb-init
+      enabled: true
+    service-bsb-git:
+      plugin: service-bsb-git
+      enabled: true
+    service-bsb-npm:
+      plugin: service-bsb-npm
+      enabled: true

@@ -29,7 +29,8 @@
   },
   "linterOptions": {
     "exclude": [
-      "src/plugins/-*/**/*.*"
+      "src/plugins/-*/**/*.*",
+      "src/plugins/*-test/**/*.*"
     ]
   },
   "compileOnSave": true,
@@ -38,7 +39,7 @@
   ],
   "exclude": [
     "node_modules/**",
-    "src/plugins/*-test*/**/*.*",
+    "src/plugins/*-test/**/*.*",
     "src/plugins/-*/**/*.*"
   ]
 }
