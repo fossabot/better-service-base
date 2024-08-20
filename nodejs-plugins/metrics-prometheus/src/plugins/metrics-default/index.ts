@@ -28,7 +28,7 @@ export class Plugin
     }>;
   }> = [];
 
-  public startTrace(pluginName: string, traceId: string): void | Promise<void> {
+  public startTrace(timestamp:number, pluginName: string, traceId: string): void | Promise<void> {
     this.traces.push({
       id: traceId,
       startTime: new Date().getTime(),
@@ -38,7 +38,7 @@ export class Plugin
     console.log("startTrace: " + traceId);
   }
 
-  public endTrace(pluginName: string, traceId: string, attributes?: Record<string, string>): void | Promise<void> {
+  public endTrace(timestamp:number, pluginName: string, traceId: string, attributes?: Record<string, string>): void | Promise<void> {
     const trace = this.traces.find((x) => x.id === traceId);
     if (trace === undefined) {
       throw new BSBError("No trace found with id: " + traceId);
@@ -62,7 +62,7 @@ export class Plugin
     }
   }
 
-  public startSpan(pluginName: string, traceId: string, spanId: string, name: string, attributes?: Record<string, string>): void | Promise<void> {
+  public startSpan(timestamp:number, pluginName: string, traceId: string, spanId: string, name: string, attributes?: Record<string, string>): void | Promise<void> {
     const trace = this.traces.find((x) => x.id === traceId);
     if (trace === undefined) {
       throw new BSBError("No trace found with id: " + traceId);
@@ -76,7 +76,7 @@ export class Plugin
     });
   }
 
-  public endSpan(pluginName: string, traceId: string, spanId: string, attributes?: Record<string, string>): void | Promise<void> {
+  public endSpan(timestamp:number, pluginName: string, traceId: string, spanId: string, attributes?: Record<string, string>): void | Promise<void> {
     const trace = this.traces.find((x) => x.id === traceId);
     if (trace === undefined) {
       throw new BSBError("No trace found with id: " + traceId);
@@ -95,7 +95,7 @@ export class Plugin
     span.endTime = new Date().getTime();
   }
 
-  public errorSpan(pluginName: string, traceId: string, spanId: string, error: BSBError<any> | Error, attributes?: Record<string, string>): void | Promise<void> {
+  public errorSpan(timestamp:number, pluginName: string, traceId: string, spanId: string, error: BSBError<any> | Error, attributes?: Record<string, string>): void | Promise<void> {
     const trace = this.traces.find((x) => x.id === traceId);
     if (trace === undefined) {
       throw new BSBError("No trace found with id: " + traceId);
@@ -212,7 +212,7 @@ export class Plugin
                 ].join("") + "%s" + CONSOLE_COLOURS.Reset, formattedMessage);
   }
 
-  createCounter(pluginName: string, name: string, description?: string): void {
+  createCounter(timestamp:number, pluginName: string, name: string, description?: string): void {
     const type = "counter";
     name = name.replaceAll(".", "_")
                .replaceAll("-", "_") + "_" + type;
@@ -231,7 +231,7 @@ export class Plugin
     this.registry.registerMetric(this.metrics[type][name].ref);
   }
 
-  createGauge(pluginName: string, name: string, description?: string): void {
+  createGauge(timestamp:number, pluginName: string, name: string, description?: string): void {
     const type = "gauge";
     name = name.replaceAll(".", "_")
                .replaceAll("-", "_") + "_" + type;
@@ -251,7 +251,7 @@ export class Plugin
     this.registry.registerMetric(this.metrics[type][name].ref);
   }
 
-  createHistogram(pluginName: string, name: string, description?: string, boundaries?: number[] | undefined): void {
+  createHistogram(timestamp:number, pluginName: string, name: string, description?: string, boundaries?: number[] | undefined): void {
     const type = "histogram";
     name = name.replaceAll(".", "_")
                .replaceAll("-", "_") + "_" + type;
@@ -270,15 +270,15 @@ export class Plugin
     this.registry.registerMetric(this.metrics[type][name].ref);
   }
 
-  updateCounter(event: "inc", pluginName: string, name: string, value: number, labels?: Record<string, string> | undefined): void {
+  updateCounter(timestamp:number, event: "inc", pluginName: string, name: string, value: number, labels?: Record<string, string> | undefined): void {
     this.updateMetric("counter", event, name, value, labels);
   }
 
-  updateGauge(event: "set" | "inc" | "dec", pluginName: string, name: string, value: number, labels?: Record<string, string> | undefined): void {
+  updateGauge(event: "set" | "inc" | "dec", timestamp:number, pluginName: string, name: string, value: number, labels?: Record<string, string> | undefined): void {
     this.updateMetric("gauge", event, name, value, labels);
   }
 
-  updateHistogram(event: "record", pluginName: string, name: string, value: number, labels?: Record<string, string> | undefined): void {
+  updateHistogram(timestamp:number, event: "record", pluginName: string, name: string, value: number, labels?: Record<string, string> | undefined): void {
     this.updateMetric("histogram", event, name, value, labels);
   }
 }

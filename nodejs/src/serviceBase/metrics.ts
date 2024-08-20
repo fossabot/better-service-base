@@ -19,6 +19,7 @@ export class SBMetrics {
   private sbPlugins: SBPlugins;
   private log: IPluginLogger;
   private _ready = false;
+
   public get isReady() {
     return this._ready;
   }
@@ -37,59 +38,59 @@ export class SBMetrics {
     const metricsPluginName = "core-metrics";
     this.log = new PluginLogger(this.mode, metricsPluginName, sbLogging);
 
-    this.metricsBus.on("createCounter", async (pluginName, name, description, help) => {
+    this.metricsBus.on("createCounter", async (timestamp: number, pluginName, name, description, help) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.createCounter, pluginName, name, description, help);
+        await SmartFunctionCallAsync(plugin, plugin.createCounter, timestamp, pluginName, name, description, help);
       }
     });
-    this.metricsBus.on("createGauge", async (pluginName, name, description, help) => {
+    this.metricsBus.on("createGauge", async (timestamp: number, pluginName, name, description, help) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.createGauge, pluginName, name, description, help);
+        await SmartFunctionCallAsync(plugin, plugin.createGauge, timestamp, pluginName, name, description, help);
       }
     });
-    this.metricsBus.on("createHistogram", async (pluginName, name, description, help, boundaries) => {
+    this.metricsBus.on("createHistogram", async (timestamp: number, pluginName, name, description, help, boundaries) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.createHistogram, pluginName, name, description, help, boundaries);
+        await SmartFunctionCallAsync(plugin, plugin.createHistogram, timestamp, pluginName, name, description, help, boundaries);
       }
     });
-    this.metricsBus.on("updateCounter", async (event: "inc", pluginName, name, value, labels) => {
+    this.metricsBus.on("updateCounter", async (timestamp: number, event: "inc", pluginName, name, value, labels) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.updateCounter, event, pluginName, name, value, labels);
+        await SmartFunctionCallAsync(plugin, plugin.updateCounter, timestamp, event, pluginName, name, value, labels);
       }
     });
-    this.metricsBus.on("updateGauge", async (event: "set" | "inc" | "dec", pluginName, name, value, labels) => {
+    this.metricsBus.on("updateGauge", async (timestamp: number, event: "set" | "inc" | "dec", pluginName, name, value, labels) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.updateGauge, event, pluginName, name, value, labels);
+        await SmartFunctionCallAsync(plugin, plugin.updateGauge, timestamp, event, pluginName, name, value, labels);
       }
     });
-    this.metricsBus.on("updateHistogram", async (event: "record", pluginName, name, value, labels) => {
+    this.metricsBus.on("updateHistogram", async (timestamp: number, event: "record", pluginName, name, value, labels) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.updateHistogram, event, pluginName, name, value, labels);
+        await SmartFunctionCallAsync(plugin, plugin.updateHistogram, timestamp, event, pluginName, name, value, labels);
       }
     });
-    this.metricsBus.on("startTrace", async (pluginName, traceId) => {
+    this.metricsBus.on("startTrace", async (timestamp: number, pluginName, traceId) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.startTrace, pluginName, traceId);
+        await SmartFunctionCallAsync(plugin, plugin.startTrace, timestamp, pluginName, traceId);
       }
     });
-    this.metricsBus.on("endTrace", async (pluginName, traceId, attributes) => {
+    this.metricsBus.on("endTrace", async (timestamp: number, pluginName, traceId, attributes) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.endTrace, pluginName, traceId, attributes);
+        await SmartFunctionCallAsync(plugin, plugin.endTrace, timestamp, pluginName, traceId, attributes);
       }
     });
-    this.metricsBus.on("startSpan", async (pluginName, traceId, spanId, name, attributes) => {
+    this.metricsBus.on("startSpan", async (timestamp: number, pluginName, traceId, spanId, name, attributes) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.startSpan, pluginName, traceId, spanId, name, attributes);
+        await SmartFunctionCallAsync(plugin, plugin.startSpan, timestamp, pluginName, traceId, spanId, name, attributes);
       }
     });
-    this.metricsBus.on("endSpan", async (pluginName, traceId, spanId, attributes) => {
+    this.metricsBus.on("endSpan", async (timestamp: number, pluginName, traceId, spanId, attributes) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.endSpan, pluginName, traceId, spanId, attributes);
+        await SmartFunctionCallAsync(plugin, plugin.endSpan, timestamp, pluginName, traceId, spanId, attributes);
       }
     });
-    this.metricsBus.on("errorSpan", async (pluginName, traceId, spanId, error, attributes) => {
+    this.metricsBus.on("errorSpan", async (timestamp: number, pluginName, traceId, spanId, error, attributes) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.errorSpan, pluginName, traceId, spanId, error, attributes);
+        await SmartFunctionCallAsync(plugin, plugin.errorSpan, timestamp, pluginName, traceId, spanId, error, attributes);
       }
     });
   }
@@ -181,9 +182,9 @@ export class SBMetrics {
     });
 
     let pluginConfig =
-            (
-                await sbConfig.getPluginConfig("metrics", plugin.name)
-            ) ?? null;
+        (
+            await sbConfig.getPluginConfig("metrics", plugin.name)
+        ) ?? null;
 
     if (
         newPlugin.serviceConfig?.validationSchema

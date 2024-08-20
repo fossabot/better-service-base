@@ -21,10 +21,10 @@ export class PluginMetrics
     if (!this.metrics.isReady) {
       throw new BSBError("Metrics not ready!");
     }
-    this.metrics.metricsBus.emit("createCounter", this.pluginName, name, description, help);
+    this.metrics.metricsBus.emit("createCounter", Date.now(), this.pluginName, name, description, help);
     return {
       inc: (value: number, labels?: Record<string, string>) => {
-        this.metrics.metricsBus.emit("updateCounter", "inc", this.pluginName, name, value, labels);
+        this.metrics.metricsBus.emit("updateCounter", Date.now(), "inc", this.pluginName, name, value, labels);
       },
     };
   }
@@ -33,16 +33,16 @@ export class PluginMetrics
     if (!this.metrics.isReady) {
       throw new BSBError("Metrics not ready!");
     }
-    this.metrics.metricsBus.emit("createGauge", this.pluginName, name, description, help);
+    this.metrics.metricsBus.emit("createGauge", Date.now(), this.pluginName, name, description, help);
     return {
       set: (value: number, labels?: Record<string, string>) => {
-        this.metrics.metricsBus.emit("updateGauge", "set", this.pluginName, name, value, labels);
+        this.metrics.metricsBus.emit("updateGauge", Date.now(), "set", this.pluginName, name, value, labels);
       },
       increment: (value: number = 1, labels?: Record<string, string>) => {
-        this.metrics.metricsBus.emit("updateGauge", "inc", this.pluginName, name, value, labels);
+        this.metrics.metricsBus.emit("updateGauge", Date.now(), "inc", this.pluginName, name, value, labels);
       },
       decrement: (value: number = 1, labels?: Record<string, string>) => {
-        this.metrics.metricsBus.emit("updateGauge", "dec", this.pluginName, name, value, labels);
+        this.metrics.metricsBus.emit("updateGauge", Date.now(), "dec", this.pluginName, name, value, labels);
       },
     };
   }
@@ -51,10 +51,10 @@ export class PluginMetrics
     if (!this.metrics.isReady) {
       throw new BSBError("Metrics not ready!");
     }
-    this.metrics.metricsBus.emit("createHistogram", this.pluginName, name, description, help, boundaries);
+    this.metrics.metricsBus.emit("createHistogram", Date.now(), this.pluginName, name, description, help, boundaries);
     return {
       record: (value: number, labels?: Record<string, string>) => {
-        this.metrics.metricsBus.emit("updateHistogram", "record", this.pluginName, name, value, labels);
+        this.metrics.metricsBus.emit("updateHistogram", Date.now(), "record", this.pluginName, name, value, labels);
       },
     };
   }
@@ -66,7 +66,7 @@ export class PluginMetrics
     const context = this;
     const traceId = parentId ?? this.pluginNameSim + "-" + uuidv7();
     if (parentId === undefined) {
-      context.metrics.metricsBus.emit("startTrace", context.pluginName, traceId);
+      context.metrics.metricsBus.emit("startTrace", Date.now(), context.pluginName, traceId);
     }
     return {
       id: traceId,
@@ -74,21 +74,21 @@ export class PluginMetrics
         const spanId = parentSpanId ?? traceId + ":" + uuidv7();
         if (parentSpanId
             === undefined) {
-          context.metrics.metricsBus.emit("startSpan", context.pluginName, traceId, spanId, name, attributes);
+          context.metrics.metricsBus.emit("startSpan", Date.now(), context.pluginName, traceId, spanId, name, attributes);
         }
         return {
           id: spanId,
           traceId: traceId,
           end: () => {
-            context.metrics.metricsBus.emit("endSpan", context.pluginName, traceId, spanId, attributes);
+            context.metrics.metricsBus.emit("endSpan", Date.now(), context.pluginName, traceId, spanId, attributes);
           },
           error: (error: BSBError<any> | Error) => {
-            context.metrics.metricsBus.emit("errorSpan", context.pluginName, traceId, spanId, error, attributes);
+            context.metrics.metricsBus.emit("errorSpan", Date.now(), context.pluginName, traceId, spanId, error, attributes);
           },
         };
       },
       end: (attributes?: Record<string, string>) => {
-        context.metrics.metricsBus.emit("endTrace", context.pluginName, traceId, attributes);
+        context.metrics.metricsBus.emit("endTrace", Date.now(), context.pluginName, traceId, attributes);
       },
     };
   }
