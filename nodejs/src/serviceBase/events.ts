@@ -64,7 +64,7 @@ export class SBEvents {
   }
 
   public dispose() {
-    for (let eventsIndex = 0 ; eventsIndex < this.events.length ; eventsIndex++) {
+    for (let eventsIndex = 0; eventsIndex < this.events.length; eventsIndex++) {
       if (this.events[eventsIndex].plugin.dispose !== undefined) {
         SmartFunctionCallSync(
             this.events[eventsIndex].plugin,
@@ -131,8 +131,8 @@ export class SBEvents {
             return false;
           }
           if ((
-                  eventPlugin.on as EventsFilterDetailed
-              )[event].enabled !== true) {
+              eventPlugin.on as EventsFilterDetailed
+          )[event].enabled !== true) {
             return false;
           }
           return (
@@ -167,12 +167,12 @@ export class SBEvents {
 
   public async init(sbConfig: SBConfig, sbLogging: SBLogging) {
     this.log.debug("INIT SBEvents");
-    
+
     this.metricCounters = {} as any;
     this.metricGauges = {} as any;
     for (const event of Object.keys(EventsEventTypesBase) as Array<keyof typeof EventsEventTypesBase>) {
-      this.metricCounters[event] = this.metrics.createCounter(event);
-      this.metricGauges[event] = this.metrics.createGauge(event);
+      this.metricCounters[event] = this.metrics.createCounter(event, 'BSB Internal Events ' + event, 'Internal metrics for BSB events');
+      this.metricGauges[event] = this.metrics.createGauge(event, 'BSB Internal Events ' + event, 'Internal metrics for BSB events');
     }
 
     const plugins = await sbConfig.getEventsPlugins();
@@ -264,8 +264,7 @@ export class SBEvents {
     if (filter) {
       if (Array.isArray(filter)) {
         eventAsType = "events";
-      }
-      else if (typeof filter === "object") {
+      } else if (typeof filter === "object") {
         const methods = Object.keys(EventsEventTypesBase);
         for (const method of methods) {
           if (
@@ -276,11 +275,9 @@ export class SBEvents {
             const methodValue = filter[method as keyof typeof filter];
             if (typeof methodValue === "boolean") {
               eventAsType = "eventsState";
-            }
-            else if (Array.isArray(methodValue)) {
+            } else if (Array.isArray(methodValue)) {
               eventAsType = "eventsPlugins";
-            }
-            else if (typeof methodValue === "object") {
+            } else if (typeof methodValue === "object") {
               eventAsType = "eventsDetailed";
             }
           }
@@ -343,9 +340,9 @@ export class SBEvents {
     }
 
     let pluginConfig =
-            (
-                await sbConfig.getPluginConfig("events", plugin.name)
-            ) ?? null;
+        (
+            await sbConfig.getPluginConfig("events", plugin.name)
+        ) ?? null;
 
     if (
         !Tools.isNullOrUndefined(newPlugin) &&
@@ -374,8 +371,8 @@ export class SBEvents {
       await SmartFunctionCallAsync(context, listener, ...iargs);
       const diff = process.hrtime(start);
       const time = (
-                       diff[0] * NS_PER_SEC + diff[1]
-                   ) * MS_PER_NS;
+          diff[0] * NS_PER_SEC + diff[1]
+      ) * MS_PER_NS;
       this.log.debug(
           "on-broadcast-{eventsPluginName}-{pluginName}-{event}:{time}",
           {
@@ -387,8 +384,7 @@ export class SBEvents {
       );
       this.metricCounters["onBroadcast"].inc(1, {pluginName, event});
       this.metricGauges["onBroadcast"].set(time, {pluginName, event});
-    }
-    catch (exc: any) {
+    } catch (exc: any) {
       this.log.error(
           "[{eventsPluginName}:{pluginName}:{event}:handleOnBroadcast] error occured: ${error}",
           {
@@ -468,8 +464,8 @@ export class SBEvents {
       await SmartFunctionCallAsync(context, listener, ...iargs);
       const diff = process.hrtime(start);
       const time = (
-                       diff[0] * NS_PER_SEC + diff[1]
-                   ) * MS_PER_NS;
+          diff[0] * NS_PER_SEC + diff[1]
+      ) * MS_PER_NS;
       this.log.debug(
           "on-event-{eventsPluginName}-{pluginName}-{event}:{time}",
           {
@@ -481,8 +477,7 @@ export class SBEvents {
       );
       this.metricCounters["onEvent"].inc(1, {pluginName, event});
       this.metricGauges["onEvent"].set(time, {pluginName, event});
-    }
-    catch (exc: any) {
+    } catch (exc: any) {
       this.log.error(
           "[{eventsPluginName}:{pluginName}:{event}:handleOnEvent] error occured: ${error}",
           {
@@ -602,8 +597,8 @@ export class SBEvents {
       const resp = await SmartFunctionCallAsync(context, listener, ...iargs);
       const diff = process.hrtime(start);
       const time = (
-                       diff[0] * NS_PER_SEC + diff[1]
-                   ) * MS_PER_NS;
+          diff[0] * NS_PER_SEC + diff[1]
+      ) * MS_PER_NS;
       this.log.debug(
           "on-returnableevent-{eventsPluginName}-{pluginName}-{event}:{time}",
           {
@@ -616,8 +611,7 @@ export class SBEvents {
       this.metricCounters["onReturnableEvent"].inc(1, {pluginName, event});
       this.metricGauges["onReturnableEvent"].set(time, {pluginName, event});
       return resp;
-    }
-    catch (exc: any) {
+    } catch (exc: any) {
       this.log.error(
           "[{eventsPluginName}:{pluginName}:{event}:handleOnReturnableEvent] error occured: ${error}",
           {
@@ -711,8 +705,8 @@ export class SBEvents {
       );
       const diff = process.hrtime(start);
       const time = (
-                       diff[0] * NS_PER_SEC + diff[1]
-                   ) * MS_PER_NS;
+          diff[0] * NS_PER_SEC + diff[1]
+      ) * MS_PER_NS;
       this.log.debug(
           "emit-eventandreturn-{pluginName}-{event}:{time}",
           {
@@ -724,8 +718,7 @@ export class SBEvents {
       this.metricCounters["emitEventAndReturn"].inc(1, {pluginName, event});
       this.metricGauges["emitEventAndReturn"].set(time, {pluginName, event});
       return resp;
-    }
-    catch (exc: any) {
+    } catch (exc: any) {
       this.log.error(
           "[{eventsPluginName}:{pluginName}:{event}:emitEventAndReturn] error occured: ${error}",
           {
@@ -763,8 +756,8 @@ export class SBEvents {
       );
       const diff = process.hrtime(start);
       const time = (
-                       diff[0] * NS_PER_SEC + diff[1]
-                   ) * MS_PER_NS;
+          diff[0] * NS_PER_SEC + diff[1]
+      ) * MS_PER_NS;
       this.log.debug(
           "emit-eventandreturn-{pluginName}-{event}:{time}",
           {
@@ -776,8 +769,7 @@ export class SBEvents {
       this.metricCounters["emitEventAndReturnSpecific"].inc(1, {pluginName, event});
       this.metricGauges["emitEventAndReturnSpecific"].set(time, {pluginName, event});
       return resp;
-    }
-    catch (exc: any) {
+    } catch (exc: any) {
       this.log.error(
           "[{eventsPluginName}:{pluginName}:{event}:emitEventAndReturnSpecific] error occured: ${error}",
           {
@@ -810,8 +802,8 @@ export class SBEvents {
       );
       const diff = process.hrtime(start);
       const time = (
-                       diff[0] * NS_PER_SEC + diff[1]
-                   ) * MS_PER_NS;
+          diff[0] * NS_PER_SEC + diff[1]
+      ) * MS_PER_NS;
       this.log.debug(
           "receivestream-{eventsPluginName}-{pluginName}-{event}:{time}",
           {
@@ -824,8 +816,7 @@ export class SBEvents {
       this.metricCounters["receiveStream"].inc(1, {pluginName, event});
       this.metricGauges["receiveStream"].set(time, {pluginName, event});
       return resp;
-    }
-    catch (exc: any) {
+    } catch (exc: any) {
       this.log.error(
           "[{eventsPluginName}:{pluginName}:{event}:handleOnReceiveStream] error occured: ${error}",
           {
@@ -891,8 +882,8 @@ export class SBEvents {
       );
       const diff = process.hrtime(start);
       const time = (
-                       diff[0] * NS_PER_SEC + diff[1]
-                   ) * MS_PER_NS;
+          diff[0] * NS_PER_SEC + diff[1]
+      ) * MS_PER_NS;
       this.log.debug(
           "sendstream-{pluginName}-{event}:{time}",
           {
@@ -903,8 +894,7 @@ export class SBEvents {
       );
       this.metricCounters["sendStream"].inc(1, {pluginName, event});
       this.metricGauges["sendStream"].set(time, {pluginName, event});
-    }
-    catch (exc: any) {
+    } catch (exc: any) {
       this.log.error(
           "[{eventsPluginName}:{pluginName}:{streamId}:sendStream] error occured: ${error}",
           {

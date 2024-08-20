@@ -30,15 +30,15 @@ export abstract class BSBMetrics<
     super(config);
   }
 
-  public abstract createCounter(pluginName: string, name: string, description?: string): void | Promise<void>;
+  public abstract createCounter(pluginName: string, name: string, description: string, help: string): void | Promise<void>;
 
   public abstract updateCounter(event: "inc", pluginName: string, name: string, value: number, labels?: Record<string, string>): void | Promise<void>;
 
-  public abstract createGauge(pluginName: string, name: string, description?: string): void | Promise<void>;
+  public abstract createGauge(pluginName: string, name: string, description: string, help: string): void | Promise<void>;
 
   public abstract updateGauge(event: "set" | "inc" | "dec", pluginName: string, name: string, value: number, labels?: Record<string, string>): void | Promise<void>;
 
-  public abstract createHistogram(pluginName: string, name: string, description?: string, boundaries?: number[] | undefined): void | Promise<void>;
+  public abstract createHistogram(pluginName: string, name: string, description: string, help: string, boundaries?: number[] | undefined): void | Promise<void>;
 
   public abstract updateHistogram(event: "record", pluginName: string, name: string, value: number, labels?: Record<string, string>): void | Promise<void>;
 
@@ -99,7 +99,7 @@ export class BSBMetricsRef
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "gaugeEvent");
   }
 
-  createHistogram(pluginName: string, name: string, description?: string, boundaries?: number[] | undefined): void {
+  createHistogram(pluginName: string, name: string, description: string, help: string, boundaries?: number[] | undefined): void {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "createHistogram");
   }
 

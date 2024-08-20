@@ -1,8 +1,9 @@
 import {v7 as uuidv7} from "uuid";
-import {CleanStringStrength, Counter, Gauge, Histogram, IPluginMetrics, Span, Trace} from "../interfaces";
-import {SBMetrics} from "../serviceBase";
+import {CleanStringStrength, Counter, Gauge, Histogram, IPluginMetrics, Span, Timer, Trace} from "../interfaces";
+import {MS_PER_NS, SBMetrics} from "../serviceBase";
 import {BSBError} from "./errorMessages";
 import {Tools} from "./tools";
+import {NS_PER_SEC} from "../serviceBase/serviceBase";
 
 export class PluginMetrics
     implements IPluginMetrics {
@@ -16,11 +17,11 @@ export class PluginMetrics
     this.pluginNameSim = Tools.cleanString(plugin, 50, CleanStringStrength.exhard, false);
   }
 
-  public createCounter(name: string, description?: string): Counter {
+  public createCounter(name: string, description: string, help: string): Counter {
     if (!this.metrics.isReady) {
       throw new BSBError("Metrics not ready!");
     }
-    this.metrics.metricsBus.emit("createCounter", this.pluginName, name, description);
+    this.metrics.metricsBus.emit("createCounter", this.pluginName, name, description, help);
     return {
       inc: (value: number, labels?: Record<string, string>) => {
         this.metrics.metricsBus.emit("updateCounter", "inc", this.pluginName, name, value, labels);
@@ -28,11 +29,11 @@ export class PluginMetrics
     };
   }
 
-  public createGauge(name: string, description?: string): Gauge {
+  public createGauge(name: string, description: string, help: string): Gauge {
     if (!this.metrics.isReady) {
       throw new BSBError("Metrics not ready!");
     }
-    this.metrics.metricsBus.emit("createGauge", this.pluginName, name, description);
+    this.metrics.metricsBus.emit("createGauge", this.pluginName, name, description, help);
     return {
       set: (value: number, labels?: Record<string, string>) => {
         this.metrics.metricsBus.emit("updateGauge", "set", this.pluginName, name, value, labels);
@@ -46,11 +47,11 @@ export class PluginMetrics
     };
   }
 
-  public createHistogram(name: string, description?: string, boundaries?: number[] | undefined): Histogram {
+  public createHistogram(name: string, description: string, help: string, boundaries?: number[] | undefined): Histogram {
     if (!this.metrics.isReady) {
       throw new BSBError("Metrics not ready!");
     }
-    this.metrics.metricsBus.emit("createHistogram", this.pluginName, name, description, boundaries);
+    this.metrics.metricsBus.emit("createHistogram", this.pluginName, name, description, help, boundaries);
     return {
       record: (value: number, labels?: Record<string, string>) => {
         this.metrics.metricsBus.emit("updateHistogram", "record", this.pluginName, name, value, labels);
@@ -90,5 +91,20 @@ export class PluginMetrics
         context.metrics.metricsBus.emit("endTrace", context.pluginName, traceId, attributes);
       },
     };
+  }
+
+  public createTimer(): Timer {
+    if (!this.metrics.isReady) {
+      throw new BSBError("Metrics not ready!");
+    }
+    const start = process.hrtime();
+    return {
+      stop: () => {
+        const diff = process.hrtime(start);
+        return (
+            diff[0] * NS_PER_SEC + diff[1]
+        ) * MS_PER_NS;
+      }
+    }
   }
 }

@@ -20,6 +20,7 @@ export interface IPluginMetrics {
    *
    * @param name - The name of the counter metric
    * @param description - A description of the counter metric
+   * @param help - More information about the counter metric
    * @returns A Counter object that can be used to update the counter metric
    *
    * @example
@@ -30,7 +31,7 @@ export interface IPluginMetrics {
    * counter.inc(10); // Increment the counter by 10
    * ```
    */
-  createCounter(name: string, description?: string): Counter;
+  createCounter(name: string, description: string, help: string): Counter;
 
   /**
    * Creates a gauge metric.
@@ -51,6 +52,7 @@ export interface IPluginMetrics {
    *
    * @param name - The name of the gauge metric
    * @param description - A description of the gauge metric
+   * @param help - More information about the gauge metric
    * @returns A Gauge object that can be used to update the gauge metric
    *
    * @example
@@ -65,7 +67,7 @@ export interface IPluginMetrics {
    * gauge.decrement(10); // Decrement the gauge by 10
    * ```
    */
-  createGauge(name: string, description?: string): Gauge;
+  createGauge(name: string, description: string, help: string): Gauge;
 
   /**
    * Creates a histogram metric.
@@ -86,6 +88,7 @@ export interface IPluginMetrics {
    *
    * @param name - The name of the histogram metric
    * @param description - A description of the histogram metric
+   * @param help - More information about the histogram metric
    * @param boundaries - Optional boundaries for the histogram metric
    * @returns A Histogram object that can be used to update the histogram metric
    *
@@ -97,7 +100,7 @@ export interface IPluginMetrics {
    * histogram.record(30); // Record the value 30 in the histogram
    * ```
    */
-  createHistogram(name: string, description?: string, boundaries?: number[]): Histogram;
+  createHistogram(name: string, description: string, help: string, boundaries?: number[]): Histogram;
 
   /**
    * Creates a trace metric.
@@ -136,6 +139,41 @@ export interface IPluginMetrics {
    * ```
    */
   createTrace(parentId?: string): Trace;
+
+  /***
+   * Create Timer
+   * A Timer is a metric that measures the time taken to execute a block of code.
+   * It provides a simple way to measure the time taken to execute a block of code.
+   *
+   * @remarks
+   * Use Cases:
+   *
+   * Event Timing: Measuring the time taken to execute a block of code.
+   * Work Done: Measuring the time taken to execute a block of code.
+   * Characteristics:
+   *
+   * Monotonic: Timers can only increase or reset. They cannot decrease.
+   * Sum: The focus is on the total accumulated value over time.
+   * Example: A Timer can be used to measure the time taken to execute a block of code.
+   *
+   * @returns A Timer object that can be used to update the timer metric
+   *
+   * @example
+   * ```ts
+   * let timer = this.metrics.createTimer(); // Start the timer
+   * // Do some work
+   * let elapsedTime = timer.stop(); // Stop the timer and get the elapsed time in nanoseconds
+   * ```
+   */
+  createTimer(): Timer
+}
+
+export interface Timer {
+  /**
+   * Stops the timer
+   * @return The elapsed time in milliseconds
+   */
+  stop(): number
 }
 
 export interface Trace {
