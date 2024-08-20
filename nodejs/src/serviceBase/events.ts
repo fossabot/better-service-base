@@ -23,7 +23,7 @@ import {SBLogging} from "./logging";
 import {SBMetrics} from "./metrics";
 import {SBPlugins} from "./plugins";
 import {Counter} from "../interfaces";
-import {MS_PER_NS, NS_PER_SEC} from "./serviceBase";
+import {MS_PER_NS, NS_PER_SEC} from "../base/base";
 
 /**
  * BSB Events Controller

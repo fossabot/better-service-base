@@ -1,4 +1,5 @@
 import {BSBService, BSBPluginEvents} from "../../index";
+import {BSBServiceClientDefinition} from "../../base";
 
 export interface Events
     extends BSBPluginEvents {
@@ -20,6 +21,9 @@ export interface Events
 
 export class Plugin
     extends BSBService<null, Events> {
+  public static PLUGIN_CLIENT: BSBServiceClientDefinition = {
+    name: "service-default1",
+  }
   public initBeforePlugins?: string[] | undefined;
   public initAfterPlugins?: string[] | undefined;
   public runBeforePlugins?: string[] | undefined;

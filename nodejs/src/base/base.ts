@@ -230,3 +230,12 @@ export abstract class BaseWithLoggingAndConfig<
         );
   }
 }
+
+/**
+ * @hidden
+ */
+export const NS_PER_SEC = 1e9;
+/**
+ * @hidden
+ */
+export const MS_PER_NS = 1e-6;

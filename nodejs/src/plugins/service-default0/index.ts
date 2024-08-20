@@ -1,6 +1,7 @@
 import {BSBPluginConfig, BSBService, BSBServiceConstructor, ServiceClient} from "../../base";
 import {Plugin as Default1Plugin} from "../../plugins/service-default1/index";
 import {z} from "zod";
+import {BSBServiceClientDefinition} from "../../base";
 
 export const secSchema = z.object({
   testa: z.number(),
@@ -46,6 +47,9 @@ export interface Events {
 
 export class Plugin
     extends BSBService<Config, Events> {
+  public static PLUGIN_CLIENT: BSBServiceClientDefinition = {
+    name: "service-default0",
+  }
   public initBeforePlugins?: string[] | undefined;
   //public initAfterPlugins: string[] = ["service-default3"];
   public initAfterPlugins?: string[] | undefined;

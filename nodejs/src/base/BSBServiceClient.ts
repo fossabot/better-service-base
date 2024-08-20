@@ -7,6 +7,7 @@ import {
 import {BSBService, BSBServiceRef} from "./BSBService";
 import {BSBError} from "./errorMessages";
 import {PluginEvents} from "./PluginEvents";
+import {Tools} from "./tools";
 
 /**
  * @hidden
@@ -106,6 +107,12 @@ export class ServiceClient<
 
   constructor(service: ServiceT, context: BSBService) {
     super(context);
+    if (!Tools.isObject(service.PLUGIN_CLIENT)) {
+      throw new BSBError("Plugin client is not defined in the service!");
+    }
+    if (!Tools.isString(service.PLUGIN_CLIENT.name)) {
+      throw new BSBError("Plugin client name is not defined in the service!");
+    }
     this.pluginName = service.PLUGIN_CLIENT.name;
     this.initBeforePlugins = service.PLUGIN_CLIENT.initBeforePlugins;
     this.initAfterPlugins = service.PLUGIN_CLIENT.initAfterPlugins;

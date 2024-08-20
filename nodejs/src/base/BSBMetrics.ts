@@ -7,8 +7,8 @@ export interface BSBMetricsConstructor<
 >
     extends BaseWithConfigConfig<
         ReferencedConfig extends null
-        ? null
-        : BSBReferencePluginConfigDefinition<ReferencedConfig>
+            ? null
+            : BSBReferencePluginConfigDefinition<ReferencedConfig>
     > {
 }
 
@@ -23,8 +23,8 @@ export abstract class BSBMetrics<
 >
     extends BaseWithConfig<
         ReferencedConfig extends null
-        ? null
-        : BSBReferencePluginConfigDefinition<ReferencedConfig>
+            ? null
+            : BSBReferencePluginConfigDefinition<ReferencedConfig>
     > {
   constructor(config: BSBMetricsConstructor<ReferencedConfig>) {
     super(config);
@@ -59,63 +59,53 @@ export abstract class BSBMetrics<
  */
 export class BSBMetricsRef
     extends BSBMetrics {
-  public startTrace(pluginName: string, traceId: string): void | Promise<void> {
-    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "startTrace");
-  }
-
-  public endTrace(pluginName: string, traceId: string, attributes?: Record<string, string>): void | Promise<void> {
-    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "endTrace");
-  }
-
-  public startSpan(pluginName: string, traceId: string, spanId: string, name: string, attributes?: Record<string, string>): void | Promise<void> {
-    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "startSpan");
-  }
-
-  public endSpan(pluginName: string, traceId: string, spanId: string, attributes?: Record<string, string>): void | Promise<void> {
-    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "endSpan");
-  }
-
-  public errorSpan(pluginName: string, traceId: string, spanId: string, error: BSBError<any> | Error, attributes?: Record<string, string>): void | Promise<void> {
-    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "errorSpan");
-  }
-
-  public updateMetric(type: "counter" | "gauge" | "histogram", pluginName: string, name: string, value: number, labels?: Record<string, string>): void {
-    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "updateMetric");
-  }
-
-  createCounter(pluginName: string, name: string, description?: string): void {
-    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "createCounter");
-  }
-
-  updateCounter(event: "inc", pluginName: string, name: string, value: number, labels?: Record<string, string>) {
-    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "counterEvent");
-  }
-
-  createGauge(pluginName: string, name: string, description?: string): void {
-    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "createGauge");
-  }
-
-  updateGauge(event: "set" | "inc" | "dec", pluginName: string, name: string, value: number, labels?: Record<string, string>) {
-    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "gaugeEvent");
-  }
-
-  createHistogram(pluginName: string, name: string, description: string, help: string, boundaries?: number[] | undefined): void {
-    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "createHistogram");
-  }
-
-  updateHistogram(event: "record", pluginName: string, name: string, value: number, labels?: Record<string, string>) {
-    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "histogramEvent");
-  }
-
-  createTrace(pluginName: string, name: string, description?: string): void {
-    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "createTrace");
-  }
-
   dispose?(): void;
 
   init?(): void;
 
   run?(): void;
 
+  createCounter(pluginName: string, name: string, description: string, help: string): void | Promise<void> {
+    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "createCounter");
+  }
 
+  createGauge(pluginName: string, name: string, description: string, help: string): void | Promise<void> {
+    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "createGauge");
+  }
+
+  createHistogram(pluginName: string, name: string, description: string, help: string, boundaries: number[] | undefined): void | Promise<void> {
+    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "createHistogram");
+  }
+
+  endSpan(pluginName: string, traceId: string, spanId: string, attributes: Record<string, string> | undefined): void | Promise<void> {
+    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "endSpan");
+  }
+
+  endTrace(pluginName: string, traceId: string, attributes: Record<string, string> | undefined): void | Promise<void> {
+    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "endTrace");
+  }
+
+  errorSpan(pluginName: string, traceId: string, spanId: string, error: BSBError<any> | Error, attributes: Record<string, string> | undefined): void | Promise<void> {
+    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "errorSpan");
+  }
+
+  startSpan(pluginName: string, traceId: string, spanId: string, name: string, attributes: Record<string, string> | undefined): void | Promise<void> {
+    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "startSpan");
+  }
+
+  startTrace(pluginName: string, traceId: string): void | Promise<void> {
+    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "startTrace");
+  }
+
+  updateCounter(event: "inc", pluginName: string, name: string, value: number, labels: Record<string, string> | undefined): void | Promise<void> {
+    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "counterEvent");
+  }
+
+  updateGauge(event: "set" | "inc" | "dec", pluginName: string, name: string, value: number, labels: Record<string, string> | undefined): void | Promise<void> {
+    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "gaugeEvent");
+  }
+
+  updateHistogram(event: "record", pluginName: string, name: string, value: number, labels: Record<string, string> | undefined): void | Promise<void> {
+    throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "histogramEvent");
+  }
 }

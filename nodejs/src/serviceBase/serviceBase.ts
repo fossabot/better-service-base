@@ -4,12 +4,12 @@ import {
   BSBConfig,
   BSBError,
   BSBEvents, BSBLogging, BSBMetrics,
-  BSBService,
+  BSBService, MS_PER_NS, NS_PER_SEC,
   PluginLogger,
   SmartFunctionCallSync,
   Tools,
 } from "../base";
-import {DEBUG_MODE, IPluginLogger,  LogMeta, PluginTypeDefinitionRef} from "../interfaces";
+import {DEBUG_MODE, IPluginLogger, LogMeta, PluginTypeDefinitionRef} from "../interfaces";
 import {SBConfig} from "./config";
 import {SBEvents} from "./events";
 import {SBLogging} from "./logging";
@@ -36,14 +36,6 @@ export const BOOT_STAT_KEYS = {
  */
 export type BootStatKeys = (typeof BOOT_STAT_KEYS)[keyof typeof BOOT_STAT_KEYS];
 
-/**
- * @hidden
- */
-export const NS_PER_SEC = 1e9;
-/**
- * @hidden
- */
-export const MS_PER_NS = 1e-6;
 const TIMEKEEPLOG = "[TIMER] {timerName} took ({nsTime}ns) ({msTime}ms)";
 
 export class ServiceBase {
@@ -87,8 +79,8 @@ export class ServiceBase {
         this._keeps[stepName] || undefined
     ) as [number, number] | undefined);
     this._keeps[stepName] = (
-                                diff[0] * NS_PER_SEC + diff[1]
-                            ) * MS_PER_NS;
+        diff[0] * NS_PER_SEC + diff[1]
+    ) * MS_PER_NS;
     const logMeta: LogMeta<typeof TIMEKEEPLOG> = {
       nsTime: diff[0] * NS_PER_SEC + diff[1],
       msTime: this._keeps[stepName],
@@ -98,24 +90,22 @@ export class ServiceBase {
   }
 
   constructor(
-      debug: boolean              = true, // Enable debug logging (true): disabled debug logging
-      live: boolean               = false, // Disable development mode (true): changes the way plugins are imported
+      debug: boolean = true, // Enable debug logging (true): disabled debug logging
+      live: boolean = false, // Disable development mode (true): changes the way plugins are imported
       cwd: string, // Current working directory: The current directory where you are running from
-      config: typeof SBConfig     = SBConfig, // Config handler: Allows you to override default behavour,
-      plugins: typeof SBPlugins   = SBPlugins, // Plugins handler: Allows you to override default behavour,
-      logging: typeof SBLogging   = SBLogging, // Logging handler: Allows you to override default behavour,
-      metrics: typeof SBMetrics   = SBMetrics, // Metrics handler: Allows you to override default behavour,
-      events: typeof SBEvents     = SBEvents, // Events handler: Allows you to override default behavour,
+      config: typeof SBConfig = SBConfig, // Config handler: Allows you to override default behavour,
+      plugins: typeof SBPlugins = SBPlugins, // Plugins handler: Allows you to override default behavour,
+      logging: typeof SBLogging = SBLogging, // Logging handler: Allows you to override default behavour,
+      metrics: typeof SBMetrics = SBMetrics, // Metrics handler: Allows you to override default behavour,
+      events: typeof SBEvents = SBEvents, // Events handler: Allows you to override default behavour,
       services: typeof SBServices = SBServices, // Services handler: Allows you to override default behavour
   ) {
     this.cwd = cwd;
     if (live === false) {
       this.mode = "development";
-    }
-    else if (debug === true) {
+    } else if (debug === true) {
       this.mode = "production-debug";
-    }
-    else {
+    } else {
       this.mode = "production";
     }
 
@@ -265,12 +255,11 @@ export class ServiceBase {
             eCode,
             reason,
             extraMsg: Tools.isNullOrUndefined(extraData)
-                      ? ""
-                      : extraData.toString(),
+                ? ""
+                : extraData.toString(),
           },
       );
-    }
-    else {
+    } else {
       this.log.error(
           "Disposing service: {appId} code {eCode} ({reason})",
           {
@@ -293,8 +282,7 @@ export class ServiceBase {
       SmartFunctionCallSync(this.metrics, this.metrics.dispose);
       this.log.warn("Disposing logger");
       SmartFunctionCallSync(this.logging, this.logging.dispose);
-    }
-    catch (exc) {
+    } catch (exc) {
       console.error(exc);
       console.error("Disposing forcefully!");
     }

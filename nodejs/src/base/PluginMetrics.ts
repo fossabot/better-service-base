@@ -1,9 +1,9 @@
 import {v7 as uuidv7} from "uuid";
 import {CleanStringStrength, Counter, Gauge, Histogram, IPluginMetrics, Span, Timer, Trace} from "../interfaces";
-import {MS_PER_NS, SBMetrics} from "../serviceBase";
+import {SBMetrics} from "../serviceBase";
 import {BSBError} from "./errorMessages";
 import {Tools} from "./tools";
-import {NS_PER_SEC} from "../serviceBase/serviceBase";
+import {MS_PER_NS, NS_PER_SEC} from "./base";
 
 export class PluginMetrics
     implements IPluginMetrics {
