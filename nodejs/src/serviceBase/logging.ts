@@ -321,9 +321,6 @@ export class SBLogging {
       name: plugin.name,
       file: plugin.plugin,
     });
-    if (plugin.name === "logging-default") {
-      return;
-    }
     this.log.debug(`Import logging plugin: {name} from ({package}){file}`, {
       package: plugin.package ?? "-",
       name: plugin.name,
