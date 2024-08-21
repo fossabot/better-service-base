@@ -35,7 +35,7 @@ export class Plugin
   public async onBroadcast(
       pluginName: string,
       event: string,
-      listener: { (args: Array<any>): Promise<void> },
+      listener: { (traceId: string | undefined, args: Array<any>): Promise<void> },
   ): Promise<void> {
     await this.broadcast.onBroadcast(pluginName, event, listener);
   }
@@ -43,15 +43,16 @@ export class Plugin
   public async emitBroadcast(
       pluginName: string,
       event: string,
+      traceId: string | undefined,
       args: Array<any>,
   ): Promise<void> {
-    await this.broadcast.emitBroadcast(pluginName, event, args);
+    await this.broadcast.emitBroadcast(pluginName, event, traceId, args);
   }
 
   public async onEvent(
       pluginName: string,
       event: string,
-      listener: { (args: Array<any>): Promise<void> },
+      listener: { (traceId: string | undefined, args: Array<any>): Promise<void> },
   ): Promise<void> {
     await this.emit.onEvent(pluginName, event, listener);
   }
@@ -59,15 +60,16 @@ export class Plugin
   public async emitEvent(
       pluginName: string,
       event: string,
+      traceId: string | undefined,
       args: Array<any>,
   ): Promise<void> {
-    await this.emit.emitEvent(pluginName, event, args);
+    await this.emit.emitEvent(pluginName, event, traceId, args);
   }
 
   public async onReturnableEvent(
       pluginName: string,
       event: string,
-      listener: { (args: Array<any>): Promise<any> },
+      listener: { (traceId: string | undefined, args: Array<any>): Promise<any> },
   ): Promise<void> {
     await this.ear.onReturnableEvent(pluginName, event, listener);
   }
@@ -75,12 +77,14 @@ export class Plugin
   public async emitEventAndReturn(
       pluginName: string,
       event: string,
+      traceId: string | undefined,
       timeoutSeconds: number,
       args: Array<any>,
   ): Promise<any> {
     return await this.ear.emitEventAndReturn(
         pluginName,
         event,
+        traceId,
         timeoutSeconds,
         args,
     );

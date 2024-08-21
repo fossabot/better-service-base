@@ -38,19 +38,19 @@ export class SBMetrics {
     const metricsPluginName = "core-metrics";
     this.log = new PluginLogger(this.mode, metricsPluginName, sbLogging);
 
-    this.metricsBus.on("createCounter", async (timestamp: number, pluginName, name, description, help) => {
+    this.metricsBus.on("createCounter", async (timestamp: number, pluginName, name, description, help, labels) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.createCounter, timestamp, pluginName, name, description, help);
+        await SmartFunctionCallAsync(plugin, plugin.createCounter, timestamp, pluginName, name, description, help, labels);
       }
     });
-    this.metricsBus.on("createGauge", async (timestamp: number, pluginName, name, description, help) => {
+    this.metricsBus.on("createGauge", async (timestamp: number, pluginName, name, description, help, labels) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.createGauge, timestamp, pluginName, name, description, help);
+        await SmartFunctionCallAsync(plugin, plugin.createGauge, timestamp, pluginName, name, description, help, labels);
       }
     });
-    this.metricsBus.on("createHistogram", async (timestamp: number, pluginName, name, description, help, boundaries) => {
+    this.metricsBus.on("createHistogram", async (timestamp: number, pluginName, name, description, help, boundaries, labels) => {
       for (const plugin of this.metricsPlugins) {
-        await SmartFunctionCallAsync(plugin, plugin.createHistogram, timestamp, pluginName, name, description, help, boundaries);
+        await SmartFunctionCallAsync(plugin, plugin.createHistogram, timestamp, pluginName, name, description, help, boundaries, labels);
       }
     });
     this.metricsBus.on("updateCounter", async (timestamp: number, event: "inc", pluginName, name, value, labels) => {

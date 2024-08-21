@@ -26,31 +26,31 @@ export class emit
   public async onEvent(
       pluginName: string,
       event: string,
-      listener: { (args: Array<any>): Promise<void> },
+      listener: { (traceId: string|undefined, args: Array<any>): Promise<void> },
   ): Promise<void> {
     this.log.debug("onEvent: listening to {pluginName}-{event}", {
       pluginName,
       event,
     });
-    this.on(`${pluginName}-${event}`, (args: any) => {
+    this.on(`${pluginName}-${event}`, (traceId: string|undefined, args: any) => {
       if (this._lastReceivedMessageIds.includes(args.msgID)) {
         return;
       }
       this.lastReceivedMessageIds = args.msgID;
-      listener(args.data);
+      listener(traceId, args.data);
     });
   }
 
   public async emitEvent(
       pluginName: string,
       event: string,
+      traceId: string|undefined,
       args: Array<any>,
   ): Promise<void> {
-    this.log.debug("emitEvent: emitting {pluginName}-{event}", {
-      pluginName,
-      event,
+    this.log.debug("emitEvent: emitting {pluginName}-{event} with traceId {traceId}", {
+      pluginName, event, traceId: traceId ?? "no-traceId",
     });
-    this.emit(`${pluginName}-${event}`, {
+    this.emit(`${pluginName}-${event}`, traceId, {
       msgID: randomUUID(),
       data: args,
     });

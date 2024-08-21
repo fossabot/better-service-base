@@ -212,7 +212,7 @@ export class Plugin
                 ].join("") + "%s" + CONSOLE_COLOURS.Reset, formattedMessage);
   }
 
-  createCounter(timestamp:number, pluginName: string, name: string, description?: string): void {
+  createCounter(timestamp:number, pluginName: string, name: string, description: string, help: string, labels?: string[]): void {
     const type = "counter";
     name = name.replaceAll(".", "_")
                .replaceAll("-", "_") + "_" + type;
@@ -231,7 +231,7 @@ export class Plugin
     this.registry.registerMetric(this.metrics[type][name].ref);
   }
 
-  createGauge(timestamp:number, pluginName: string, name: string, description?: string): void {
+  createGauge(timestamp:number, pluginName: string, name: string, description: string, help: string, labels?: string[]): void {
     const type = "gauge";
     name = name.replaceAll(".", "_")
                .replaceAll("-", "_") + "_" + type;
@@ -251,7 +251,7 @@ export class Plugin
     this.registry.registerMetric(this.metrics[type][name].ref);
   }
 
-  createHistogram(timestamp:number, pluginName: string, name: string, description?: string, boundaries?: number[] | undefined): void {
+  createHistogram(timestamp:number, pluginName: string, name: string, description: string, help: string, boundaries?: number[], labels?: string[]): void {
     const type = "histogram";
     name = name.replaceAll(".", "_")
                .replaceAll("-", "_") + "_" + type;
@@ -270,15 +270,15 @@ export class Plugin
     this.registry.registerMetric(this.metrics[type][name].ref);
   }
 
-  updateCounter(timestamp:number, event: "inc", pluginName: string, name: string, value: number, labels?: Record<string, string> | undefined): void {
+  updateCounter(timestamp:number, event: "inc", pluginName: string, name: string, value: number, labels?: Record<string, string> ): void {
     this.updateMetric("counter", event, name, value, labels);
   }
 
-  updateGauge(event: "set" | "inc" | "dec", timestamp:number, pluginName: string, name: string, value: number, labels?: Record<string, string> | undefined): void {
+  updateGauge(timestamp:number, event: "set" | "inc" | "dec", pluginName: string, name: string, value: number, labels?: Record<string, string>): void {
     this.updateMetric("gauge", event, name, value, labels);
   }
 
-  updateHistogram(timestamp:number, event: "record", pluginName: string, name: string, value: number, labels?: Record<string, string> | undefined): void {
+  updateHistogram(timestamp:number, event: "record", pluginName: string, name: string, value: number, labels?: Record<string, string> ): void {
     this.updateMetric("histogram", event, name, value, labels);
   }
 }

@@ -53,7 +53,7 @@ export abstract class BSBEvents<
   public abstract onBroadcast(
       pluginName: string,
       event: string,
-      listener: { (args: Array<any>): Promise<void> },
+      listener: { (traceId: string|undefined, args: Array<any>): Promise<void> },
   ): Promise<void>;
 
   /**
@@ -71,6 +71,7 @@ export abstract class BSBEvents<
   public abstract emitBroadcast(
       pluginName: string,
       event: string,
+      traceId: string|undefined,
       args: Array<any>,
   ): Promise<void>;
 
@@ -91,7 +92,7 @@ export abstract class BSBEvents<
   public abstract onEvent(
       pluginName: string,
       event: string,
-      listener: { (args: Array<any>): Promise<void> },
+      listener: { (traceId: string|undefined, args: Array<any>): Promise<void> },
   ): Promise<void>;
 
   /**
@@ -110,6 +111,7 @@ export abstract class BSBEvents<
   public abstract emitEvent(
       pluginName: string,
       event: string,
+      traceId: string|undefined,
       args: Array<any>,
   ): Promise<void>;
 
@@ -130,7 +132,7 @@ export abstract class BSBEvents<
   public abstract onReturnableEvent(
       pluginName: string,
       event: string,
-      listener: { (args: Array<any>): Promise<any> },
+      listener: { (traceId: string|undefined, args: Array<any>): Promise<any> },
   ): Promise<void>;
 
   /**
@@ -150,6 +152,7 @@ export abstract class BSBEvents<
   public abstract emitEventAndReturn(
       pluginName: string,
       event: string,
+      traceId: string|undefined,
       timeoutSeconds: number,
       args: Array<any>,
   ): Promise<any>;
@@ -198,7 +201,7 @@ export class BSBEventsRef
   public onBroadcast(
       pluginName: string,
       event: string,
-      listener: (args: any[]) => Promise<void>,
+      listener: (traceId: string|undefined, args: any[]) => Promise<void>,
   ): Promise<void> {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBEventsRef", "onBroadcast");
   }
@@ -206,6 +209,7 @@ export class BSBEventsRef
   public emitBroadcast(
       pluginName: string,
       event: string,
+      traceId: string|undefined,
       args: any[],
   ): Promise<void> {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBEventsRef", "emitBroadcast");
@@ -214,7 +218,7 @@ export class BSBEventsRef
   public onEvent(
       pluginName: string,
       event: string,
-      listener: (args: any[]) => Promise<void>,
+      listener: (traceId: string|undefined, args: any[]) => Promise<void>,
   ): Promise<void> {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBEventsRef", "onEvent");
   }
@@ -222,6 +226,7 @@ export class BSBEventsRef
   public emitEvent(
       pluginName: string,
       event: string,
+      traceId: string|undefined,
       args: any[],
   ): Promise<void> {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBEventsRef", "emitEvent");
@@ -230,7 +235,7 @@ export class BSBEventsRef
   public onReturnableEvent(
       pluginName: string,
       event: string,
-      listener: (args: any[]) => Promise<any>,
+      listener: (traceId: string|undefined, args: any[]) => Promise<any>,
   ): Promise<void> {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBEventsRef", "onReturnableEvent");
   }
@@ -238,6 +243,7 @@ export class BSBEventsRef
   public emitEventAndReturn(
       pluginName: string,
       event: string,
+      traceId: string|undefined,
       timeoutSeconds: number,
       args: any[],
   ): Promise<any> {

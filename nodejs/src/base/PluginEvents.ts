@@ -53,7 +53,7 @@ export class PluginEvents<
    * await this.emitBroadcast('myEvent', 'some', 'data'); // This will be typesafe
    *
    * /// Plugin that receives a broadcast event
-   * await this.onBroadcast('myEvent', async (some: string, data: string) => {
+   * await this.onBroadcast('myEvent', async (traceId: string|undefined, some: string, data: string) => {
    *   /// Do something with the data
    * });
    * ```
@@ -78,6 +78,7 @@ export class PluginEvents<
    * Emits a broadcast event that is received by all plugins that are listening for that event
    *
    * @param event - The event to emit
+   * @param traceId - The trace ID to associate with the event
    * @param args - The arguments to pass to the event
    * @returns Promise that resolves when the event has been emitted
    *
@@ -85,10 +86,10 @@ export class PluginEvents<
    * Basic example of using broadcast events
    * ```ts
    * /// Plugin that emits a broadcast event
-   * await this.emitBroadcast('myEvent', 'some', 'data'); // This will be typesafe
+   * await this.emitBroadcast('myEvent', '{traceId}', 'some', 'data'); // This will be typesafe
    *
    * /// Plugin that receives a broadcast event
-   * await this.onBroadcast('myEvent', async (some: string, data: string) => {
+   * await this.onBroadcast('myEvent', async (traceId: string|undefined, some: string, data: string) => {
    *   /// Do something with the data
    * });
    */
@@ -99,7 +100,8 @@ export class PluginEvents<
       >
   ): Promise<void> {
     const event = args.splice(0, 1)[0] as string;
-    await this.events.emitBroadcast(this.service.pluginName, event, ...args);
+    const traceId = args.splice(0, 1)[0] as string | undefined;
+    await this.events.emitBroadcast(this.service.pluginName, event, traceId, ...args);
   }
 
   /**
@@ -116,7 +118,7 @@ export class PluginEvents<
    * await this.emitEvent('myEvent', 'some', 'data'); // This will be typesafe
    *
    * /// Plugin that receives an event
-   * await this.onEvent('myEvent', async (some: string, data: string) => {
+   * await this.onEvent('myEvent', async (traceId: string|undefined, some: string, data: string) => {
    *   /// Do something with the data
    * });
    */
@@ -140,6 +142,7 @@ export class PluginEvents<
    * Emits an event that is received by the first plugin that is listening for that event (depends on events service)
    *
    * @param event - The event to emit
+   * @param traceId - The trace ID to associate with the event
    * @param args - The arguments to pass to the event
    * @returns Promise that resolves when the event has been emitted
    *
@@ -150,7 +153,7 @@ export class PluginEvents<
    * await this.emitEvent('myEvent', 'some', 'data'); // This will be typesafe
    *
    * /// Plugin that receives an event
-   * await this.onEvent('myEvent', async (some: string, data: string) => {
+   * await this.onEvent('myEvent', async (traceId: string|undefined, some: string, data: string) => {
    *   /// Do something with the data
    * });
    */
@@ -161,7 +164,8 @@ export class PluginEvents<
       >
   ): Promise<void> {
     const event = args.splice(0, 1)[0] as string;
-    await this.events.emitEvent(this.service.pluginName, event, ...args);
+    const traceId = args.splice(0, 1)[0] as string | undefined;
+    await this.events.emitEvent(this.service.pluginName, event, traceId, ...args);
   }
 
   /**
@@ -180,7 +184,7 @@ export class PluginEvents<
    * await this.emitEventSpecific('serverId', 'myEvent', 'some', 'data'); // This will be typesafe
    *
    * /// Plugin that receives an event
-   * await this.onEventSpecific('serverId', 'myEvent', async (some: string, data: string) => {
+   * await this.onEventSpecific('serverId', 'myEvent', async (traceId: string|undefined, some: string, data: string) => {
    *   /// Do something with the data
    * });
    */
@@ -208,6 +212,7 @@ export class PluginEvents<
    *
    * @param serverId - The server ID to emit the event on
    * @param event - The event to emit
+   * @param traceId - The trace ID to associate with the event
    * @param args - The arguments to pass to the event
    * @returns Promise that resolves when the event has been emitted
    *
@@ -218,7 +223,7 @@ export class PluginEvents<
    * await this.emitEventSpecific('serverId', 'myEvent', 'some', 'data'); // This will be typesafe
    *
    * /// Plugin that receives an event
-   * await this.onEventSpecific('serverId', 'myEvent', async (some: string, data: string) => {
+   * await this.onEventSpecific('serverId', 'myEvent', async (traceId: string|undefined, some: string, data: string) => {
    *   /// Do something with the data
    * });
    */
@@ -230,10 +235,12 @@ export class PluginEvents<
       >
   ): Promise<void> {
     const event = args.splice(0, 1)[0] as string;
+    const traceId = args.splice(0, 1)[0] as string | undefined;
     await this.events.emitEventSpecific(
         serverId,
         this.service.pluginName,
         event,
+        traceId,
         ...args,
     );
   }
@@ -253,7 +260,7 @@ export class PluginEvents<
    * let result = await this.emitEventAndReturn('myEvent', 'some', 'data'); // This will be typesafe
    *
    * /// Plugin that receives a returnable event
-   * await this.onReturnableEvent('myEvent', async (some: string, data: string) => {
+   * await this.onReturnableEvent('myEvent', async (traceId: string|undefined, some: string, data: string) => {
    *   /// Do something with the data
    *   return 'some result';
    * });
@@ -278,6 +285,7 @@ export class PluginEvents<
    * Emits a returnable event that is received by the first plugin that is listening for that event (depends on events service)
    *
    * @param event - The event listen to
+   * @param traceId - The trace ID to associate with the event
    * @param args - The arguments to pass to the event
    * @returns Promise that resolves when the event has been emitted and the value has been returned
    *
@@ -288,7 +296,7 @@ export class PluginEvents<
    * let result = await this.emitEventAndReturn('myEvent', 'some', 'data'); // This will be typesafe
    *
    * /// Plugin that receives a returnable event
-   * await this.onReturnableEvent('myEvent', async (some: string, data: string) => {
+   * await this.onReturnableEvent('myEvent', async (traceId: string|undefined, some: string, data: string) => {
    *   /// Do something with the data
    *   return 'some result';
    * });
@@ -308,6 +316,7 @@ export class PluginEvents<
       >
   > {
     const event = args.splice(0, 1)[0] as string;
+    const traceId = args.splice(0, 1)[0] as string | undefined;
     const timeoutSeconds =
               args.length > 0 ? (
                   args.splice(0, 1)[0] as number
@@ -315,6 +324,7 @@ export class PluginEvents<
     return await this.events.emitEventAndReturn(
         this.service.pluginName,
         event,
+        traceId,
         timeoutSeconds,
         ...args,
     );
@@ -336,7 +346,7 @@ export class PluginEvents<
    * let result = await this.emitEventAndReturnSpecific('serverId', 'myEvent', 'some', 'data'); // This will be typesafe
    *
    * /// Plugin that receives a returnable event
-   * await this.onReturnableEventSpecific('serverId', 'myEvent', async (some: string, data: string) => {
+   * await this.onReturnableEventSpecific('serverId', 'myEvent', async (traceId: string|undefined, some: string, data: string) => {
    *   /// Do something with the data
    *   return 'some result';
    * });
@@ -365,6 +375,7 @@ export class PluginEvents<
    *
    * @param serverId - The server ID to emit the event on
    * @param event - The event emit
+   * @param traceId - The trace ID to associate with the event
    * @param args - The arguments to pass to the event
    * @returns Promise that resolves when the event has been emitted and the value has been returned
    *
@@ -375,7 +386,7 @@ export class PluginEvents<
    * let result = await this.emitEventAndReturnSpecific('serverId', 'myEvent', 'some', 'data'); // This will be typesafe
    *
    * /// Plugin that receives a returnable event
-   * await this.onReturnableEventSpecific('serverId', 'myEvent', async (some: string, data: string) => {
+   * await this.onReturnableEventSpecific('serverId', 'myEvent', async (traceId: string|undefined, some: string, data: string) => {
    *   /// Do something with the data
    *   return 'some result';
    * });
@@ -398,6 +409,7 @@ export class PluginEvents<
       >
   > {
     const event = args.splice(0, 1)[0] as string;
+    const traceId = args.splice(0, 1)[0] as string | undefined;
     const timeoutSeconds =
               args.length > 0 ? (
                   args.splice(0, 1)[0] as number
@@ -406,6 +418,7 @@ export class PluginEvents<
         serverId,
         this.service.pluginName,
         event,
+        traceId,
         timeoutSeconds,
         ...args,
     );

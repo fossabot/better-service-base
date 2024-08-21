@@ -61,7 +61,7 @@ export class Plugin
   public async init() {
     await this.events.onReturnableEvent(
         "onReverseReturnable",
-        async (tex: string) => {
+        async (traceId: string | undefined, tex: string) => {
           this.log.warn("onReverseReturnable ({tex})", {tex});
           return tex.split("")
                     .reverse()

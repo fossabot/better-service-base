@@ -74,7 +74,7 @@ export class Plugin
 
   public async run() {
     this.log.info("aa");
-    this.events.emitEvent("test", "test", "test");
+    this.events.emitEvent("test", undefined, "test", "test");
     await this.testClient.callMethod('callableMethod',
         this.config.testa,
         this.config.testb,

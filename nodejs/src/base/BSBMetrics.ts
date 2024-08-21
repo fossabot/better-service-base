@@ -30,15 +30,15 @@ export abstract class BSBMetrics<
     super(config);
   }
 
-  public abstract createCounter(timestamp: number, pluginName: string, name: string, description: string, help: string): void | Promise<void>;
+  public abstract createCounter(timestamp: number, pluginName: string, name: string, description: string, help: string, labels?: string[]): void | Promise<void>;
 
   public abstract updateCounter(timestamp: number, event: "inc", pluginName: string, name: string, value: number, labels?: Record<string, string>): void | Promise<void>;
 
-  public abstract createGauge(timestamp: number, pluginName: string, name: string, description: string, help: string): void | Promise<void>;
+  public abstract createGauge(timestamp: number, pluginName: string, name: string, description: string, help: string, labels?: string[]): void | Promise<void>;
 
   public abstract updateGauge(timestamp: number, event: "set" | "inc" | "dec", pluginName: string, name: string, value: number, labels?: Record<string, string>): void | Promise<void>;
 
-  public abstract createHistogram(timestamp: number, pluginName: string, name: string, description: string, help: string, boundaries?: number[] | undefined): void | Promise<void>;
+  public abstract createHistogram(timestamp: number, pluginName: string, name: string, description: string, help: string, boundaries?: number[], labels?: string[]): void | Promise<void>;
 
   public abstract updateHistogram(timestamp: number, event: "record", pluginName: string, name: string, value: number, labels?: Record<string, string>): void | Promise<void>;
 
@@ -65,15 +65,15 @@ export class BSBMetricsRef
 
   run?(): void;
 
-  createCounter(timestamp: number, pluginName: string, name: string, description: string, help: string): void | Promise<void> {
+  createCounter(timestamp: number, pluginName: string, name: string, description: string, help: string, labels?: string[]): void | Promise<void> {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "createCounter");
   }
 
-  createGauge(timestamp: number, pluginName: string, name: string, description: string, help: string): void | Promise<void> {
+  createGauge(timestamp: number, pluginName: string, name: string, description: string, help: string, labels?: string[]): void | Promise<void> {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "createGauge");
   }
 
-  createHistogram(timestamp: number, pluginName: string, name: string, description: string, help: string, boundaries: number[] | undefined): void | Promise<void> {
+  createHistogram(timestamp: number, pluginName: string, name: string, description: string, help: string, boundaries: number[] | undefined, labels?: string[]): void | Promise<void> {
     throw BSB_ERROR_METHOD_NOT_IMPLEMENTED("BSBMetricsRef", "createHistogram");
   }
 

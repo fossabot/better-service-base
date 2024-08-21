@@ -23,7 +23,7 @@ export function emit(
       it("only one plugin should receive the event", async () => {
         const thisPlugin = randomName();
         const thisEvent = randomName();
-        //console.log(emitter)
+        const traceId = randomUUID();
         let receiveCounter = 0;
         setTimeout(() => {
           if (receiveCounter === 1) {
@@ -34,19 +34,21 @@ export function emit(
           }
           assert.fail("Received " + receiveCounter + " events");
         }, maxTimeoutToExpectAResponse);
-        await emitter.onEvent(thisPlugin, thisEvent, async () => {
+        await emitter.onEvent(thisPlugin, thisEvent, async (receivedTraceId, args) => {
+          assert.strictEqual(receivedTraceId, traceId);
           receiveCounter++;
         });
-        await emitter.onEvent(thisPlugin, thisEvent, async () => {
+        await emitter.onEvent(thisPlugin, thisEvent, async (receivedTraceId, args) => {
+          assert.strictEqual(receivedTraceId, traceId);
           receiveCounter++;
         });
-        await emitter.emitEvent(thisPlugin, thisEvent, [emitData]);
+        await emitter.emitEvent(thisPlugin, thisEvent, traceId, [emitData]);
       });
       it("diff plugin names should not receive same event", async () => {
         const thisPlugin = randomName();
         const thisPlugin2 = randomName();
         const thisEvent = randomName();
-        //console.log(emitter)
+        const traceId = randomUUID();
         let receiveCounter = 0;
         setTimeout(() => {
           if (receiveCounter === 1) {
@@ -60,92 +62,92 @@ export function emit(
         await emitter.onEvent(thisPlugin, thisEvent, async () => {
           assert.fail("Received on diff plugin name");
         });
-        await emitter.onEvent(thisPlugin2, thisEvent, async () => {
+        await emitter.onEvent(thisPlugin2, thisEvent, async (receivedTraceId, args) => {
+          assert.strictEqual(receivedTraceId, traceId);
           receiveCounter++;
         });
-        await emitter.onEvent(thisPlugin2, thisEvent, async () => {
+        await emitter.onEvent(thisPlugin2, thisEvent, async (receivedTraceId, args) => {
+          assert.strictEqual(receivedTraceId, traceId);
           receiveCounter++;
         });
-        await emitter.emitEvent(thisPlugin2, thisEvent, [emitData]);
+        await emitter.emitEvent(thisPlugin2, thisEvent, traceId, [emitData]);
       });
       it("should be able to emit to events with plugin name defined", async () => {
         const thisPlugin = randomName();
         const thisEvent = randomName();
-        //console.log(emitter)
+        const traceId = randomUUID();
         const emitTimeout = setTimeout(() => {
           assert.fail("Event not received");
         }, maxTimeoutToExpectAResponse);
-        await emitter.onEvent(thisPlugin, thisEvent, async (data: any) => {
+        await emitter.onEvent(thisPlugin, thisEvent, async (receivedTraceId, data) => {
           clearTimeout(emitTimeout);
+          assert.strictEqual(receivedTraceId, traceId);
           assert.ok(data[0]);
         });
-        await emitter.emitEvent(thisPlugin, thisEvent, [emitData]);
+        await emitter.emitEvent(thisPlugin, thisEvent, traceId, [emitData]);
       });
       it("should be able to emit to events with self", async () => {
         const thisCaller = randomName();
         const thisEvent = randomName();
+        const traceId = randomUUID();
 
         const emitTimeout = setTimeout(() => {
           assert.fail("Event not received");
         }, maxTimeoutToExpectAResponse);
-        await emitter.onEvent(thisCaller, thisEvent, async (data: any) => {
+        await emitter.onEvent(thisCaller, thisEvent, async (receivedTraceId, data) => {
           clearTimeout(emitTimeout);
-
+          assert.strictEqual(receivedTraceId, traceId);
           assert.ok(data[0]);
         });
-        await emitter.emitEvent(thisCaller, thisEvent, [emitData]);
+        await emitter.emitEvent(thisCaller, thisEvent, traceId, [emitData]);
       });
       it("should be able to emit to events with self multi-args", async () => {
         const thisCaller = randomName();
         const thisEvent = randomName();
+        const traceId = randomUUID();
 
         const emitTimeout = setTimeout(() => {
           assert.fail("Event not received");
         }, maxTimeoutToExpectAResponse);
-        await emitter.onEvent(thisCaller, thisEvent, async (data: any) => {
+        await emitter.onEvent(thisCaller, thisEvent, async (receivedTraceId, data) => {
           clearTimeout(emitTimeout);
-
+          assert.strictEqual(receivedTraceId, traceId);
           assert.deepEqual(data[0], 0);
           assert.deepEqual(data[1], 1);
           assert.deepEqual(data[2], 2);
           assert.deepEqual(data[3], 3);
         });
-        await emitter.emitEvent(thisCaller, thisEvent, [
-          0,
-          1,
-          2,
-          3,
-        ]);
+        await emitter.emitEvent(thisCaller, thisEvent, traceId, [0, 1, 2, 3]);
       });
       it("should not be able to emit to other events with plugin name defined", async () => {
         const thisPlugin = randomName();
         const thisEvent = randomName();
         const thisEvent2 = randomName();
+        const traceId = randomUUID();
 
         const emitTimeout = setTimeout(() => {
           assert.ok(true);
         }, maxTimeoutToExpectAResponse);
         await emitter.onEvent(thisPlugin, thisEvent, async () => {
           clearTimeout(emitTimeout);
-
           assert.fail("Event received");
         });
-        await emitter.emitEvent(thisPlugin, thisEvent2, [emitData]);
+        await emitter.emitEvent(thisPlugin, thisEvent2, traceId, [emitData]);
       });
       it("should not be able to emit to other events with self", async () => {
         const thisCaller = randomName();
         const thisEvent = randomName();
         const thisEvent2 = randomName();
+        const traceId = randomUUID();
 
         const emitTimeout = setTimeout(() => {
           assert.ok(true);
         }, maxTimeoutToExpectAResponse);
         await emitter.onEvent(thisCaller, thisEvent, async () => {
           clearTimeout(emitTimeout);
-
           assert.fail("Event received");
         });
-        await emitter.emitEvent(thisCaller, thisEvent2, [emitData]);
+        await emitter.emitEvent(thisCaller, thisEvent2, traceId, [emitData]);
       });
     });
     describe("onEvent", async () => {
@@ -153,60 +155,62 @@ export function emit(
       it("should be able to emit to events with plugin name defined", async () => {
         const thisPlugin = randomName();
         const thisEvent = randomName();
+        const traceId = randomUUID();
 
         const emitTimeout = setTimeout(() => {
           assert.fail("Event not received");
         }, maxTimeoutToExpectAResponse);
-        await emitter.onEvent(thisPlugin, thisEvent, async (data: any) => {
+        await emitter.onEvent(thisPlugin, thisEvent, async (receivedTraceId, data) => {
           clearTimeout(emitTimeout);
-
+          assert.strictEqual(receivedTraceId, traceId);
           assert.deepEqual(data[0], emitData);
         });
-        await emitter.emitEvent(thisPlugin, thisEvent, [emitData]);
+        await emitter.emitEvent(thisPlugin, thisEvent, traceId, [emitData]);
       });
       it("should be able to emit to events with self", async () => {
         const thisCaller = randomName();
         const thisEvent = randomName();
+        const traceId = randomUUID();
 
         const emitTimeout = setTimeout(() => {
           assert.fail("Event not received");
         }, maxTimeoutToExpectAResponse);
-        await emitter.onEvent(thisCaller, thisEvent, async (data: any) => {
+        await emitter.onEvent(thisCaller, thisEvent, async (receivedTraceId, data) => {
           clearTimeout(emitTimeout);
-
+          assert.strictEqual(receivedTraceId, traceId);
           assert.deepEqual(data[0], emitData);
         });
-        await emitter.emitEvent(thisCaller, thisEvent, [emitData]);
+        await emitter.emitEvent(thisCaller, thisEvent, traceId, [emitData]);
       });
       it("should not be able to emit to other events with plugin name defined", async () => {
         const thisPlugin = randomName();
         const thisEvent = randomName();
         const thisEvent2 = randomName();
+        const traceId = randomUUID();
 
         const emitTimeout = setTimeout(() => {
           assert.ok(true);
         }, maxTimeoutToExpectAResponse);
         await emitter.onEvent(thisPlugin, thisEvent, async () => {
           clearTimeout(emitTimeout);
-
           assert.fail("Event received");
         });
-        await emitter.emitEvent(thisPlugin, thisEvent2, [emitData]);
+        await emitter.emitEvent(thisPlugin, thisEvent2, traceId, [emitData]);
       });
       it("should not be able to emit to other events with self", async () => {
         const thisCaller = randomName();
         const thisEvent = randomName();
         const thisEvent2 = randomName();
+        const traceId = randomUUID();
 
         const emitTimeout = setTimeout(() => {
           assert.ok(true);
         }, maxTimeoutToExpectAResponse);
         await emitter.onEvent(thisCaller, thisEvent, async () => {
           clearTimeout(emitTimeout);
-
           assert.fail("Event received");
         });
-        await emitter.emitEvent(thisCaller, thisEvent2, [emitData]);
+        await emitter.emitEvent(thisCaller, thisEvent2, traceId, [emitData]);
       });
     });
     const typesToTest = [
@@ -262,60 +266,62 @@ export function emit(
         it("should be able to emit to events with plugin name defined", async () => {
           const thisPlugin = randomName();
           const thisEvent = randomName();
+          const traceId = randomUUID();
 
           const emitTimeout = setTimeout(() => {
             assert.fail("Event not received");
           }, maxTimeoutToExpectAResponse);
-          await emitter.onEvent(thisPlugin, thisEvent, async (data: any) => {
+          await emitter.onEvent(thisPlugin, thisEvent, async (receivedTraceId, data) => {
             clearTimeout(emitTimeout);
-
+            assert.strictEqual(receivedTraceId, traceId);
             assert.deepEqual(data[0], typeToTest.data);
           });
-          await emitter.emitEvent(thisPlugin, thisEvent, [typeToTest.data]);
+          await emitter.emitEvent(thisPlugin, thisEvent, traceId, [typeToTest.data]);
         });
         it("should be able to emit to events with self", async () => {
           const thisCaller = randomName();
           const thisEvent = randomName();
+          const traceId = randomUUID();
 
           const emitTimeout = setTimeout(() => {
             assert.fail("Event not received");
           }, maxTimeoutToExpectAResponse);
-          await emitter.onEvent(thisCaller, thisEvent, async (data: any) => {
+          await emitter.onEvent(thisCaller, thisEvent, async (receivedTraceId, data) => {
             clearTimeout(emitTimeout);
-
+            assert.strictEqual(receivedTraceId, traceId);
             assert.deepEqual(data[0], typeToTest.data);
           });
-          await emitter.emitEvent(thisCaller, thisEvent, [typeToTest.data]);
+          await emitter.emitEvent(thisCaller, thisEvent, traceId, [typeToTest.data]);
         });
         it("should not be able to emit to other events with plugin name defined", async () => {
           const thisPlugin = randomName();
           const thisEvent = randomName();
           const thisEvent2 = randomName();
+          const traceId = randomUUID();
 
           const emitTimeout = setTimeout(() => {
             assert.ok(true);
           }, maxTimeoutToExpectAResponse);
           await emitter.onEvent(thisPlugin, thisEvent, async () => {
             clearTimeout(emitTimeout);
-
             assert.fail("Event received");
           });
-          await emitter.emitEvent(thisPlugin, thisEvent2, [typeToTest.data]);
+          await emitter.emitEvent(thisPlugin, thisEvent2, traceId, [typeToTest.data]);
         });
         it("should not be able to emit to other events with self", async () => {
           const thisCaller = randomName();
           const thisEvent = randomName();
           const thisEvent2 = randomName();
+          const traceId = randomUUID();
 
           const emitTimeout = setTimeout(() => {
             assert.ok(true);
           }, maxTimeoutToExpectAResponse);
           await emitter.onEvent(thisCaller, thisEvent, async () => {
             clearTimeout(emitTimeout);
-
             assert.fail("Event received");
           });
-          await emitter.emitEvent(thisCaller, thisEvent2, [typeToTest.data]);
+          await emitter.emitEvent(thisCaller, thisEvent2, traceId, [typeToTest.data]);
         });
       });
     }

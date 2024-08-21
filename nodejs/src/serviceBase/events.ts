@@ -43,8 +43,8 @@ export class SBEvents {
   private sbPlugins: SBPlugins;
   private readonly log: IPluginLogger;
   private readonly metrics: IPluginMetrics;
-  private metricCounters!: Record<EventsEventTypes, Counter>;
-  private metricGauges!: Record<EventsEventTypes, Gauge>;
+  private metricCounters!: Record<EventsEventTypes, Counter<'pluginName' | 'event'>>;
+  private metricGauges!: Record<EventsEventTypes, Gauge<'pluginName' | 'event'>>;
 
   constructor(
       appId: string,
@@ -363,12 +363,13 @@ export class SBEvents {
       pluginName: string,
       event: string,
       context: BSBService | BSBServiceClient<any>,
-      listener: { (...args: Array<any>): Promise<void> | void },
+      listener: { (traceId: string | undefined, ...args: Array<any>): Promise<void> | void },
+      traceId: string | undefined,
       iargs: Array<any>,
   ) {
     const start = process.hrtime();
     try {
-      await SmartFunctionCallAsync(context, listener, ...iargs);
+      await SmartFunctionCallAsync(context, listener, traceId, ...iargs);
       const diff = process.hrtime(start);
       const time = (
           diff[0] * NS_PER_SEC + diff[1]
@@ -402,7 +403,7 @@ export class SBEvents {
       context: BSBService<any, any> | BSBServiceClient<any>,
       pluginName: string,
       event: string,
-      listener: { (...args: Array<any>): Promise<void> | void },
+      listener: { (traceId: string | undefined, ...args: Array<any>): Promise<void> | void },
   ): Promise<void> {
     const self = this;
     const plugin = this.getPluginForEvent(
@@ -410,7 +411,7 @@ export class SBEvents {
         pluginName,
         event,
     );
-    return await plugin.plugin.onBroadcast(pluginName, event, async (iargs: Array<any>) =>
+    return await plugin.plugin.onBroadcast(pluginName, event, async (traceId: string | undefined, iargs: Array<any>) =>
         self.handleOnBroadcast.call(
             self,
             plugin.pluginName,
@@ -418,6 +419,7 @@ export class SBEvents {
             event,
             context,
             listener,
+            traceId,
             iargs,
         ),
     );
@@ -426,6 +428,7 @@ export class SBEvents {
   public async emitBroadcast(
       pluginName: string,
       event: string,
+      traceId: string | undefined,
       ...args: Array<any>
   ): Promise<void> {
     const plugin = this.getPluginForEvent(
@@ -446,6 +449,7 @@ export class SBEvents {
         plugin.plugin.emitBroadcast,
         pluginName,
         event,
+        traceId,
         args,
     );
   }
@@ -455,13 +459,14 @@ export class SBEvents {
       pluginName: string,
       event: string,
       context: BSBService | BSBServiceClient<any>,
-      listener: { (...args: Array<any>): Promise<void> | void },
+      listener: { (traceId: string | undefined, ...args: Array<any>): Promise<void> | void },
+      traceId: string | undefined,
       iargs: Array<any>,
   ) {
     const start = process.hrtime();
     try {
       //console.log("CALL ON EVENT", context, listener, iargs);
-      await SmartFunctionCallAsync(context, listener, ...iargs);
+      await SmartFunctionCallAsync(context, listener, traceId, ...iargs);
       const diff = process.hrtime(start);
       const time = (
           diff[0] * NS_PER_SEC + diff[1]
@@ -495,11 +500,11 @@ export class SBEvents {
       context: BSBService | BSBServiceClient<any>,
       pluginName: string,
       event: string,
-      listener: { (...args: Array<any>): Promise<void> | void },
+      listener: { (traceId: string | undefined, ...args: Array<any>): Promise<void> | void },
   ): Promise<void> {
     const self = this;
     const plugin = this.getPluginForEvent("onEvent", pluginName, event);
-    return await plugin.plugin.onEvent(pluginName, event, async (iargs: Array<any>) =>
+    return await plugin.plugin.onEvent(pluginName, event, async (traceId, iargs: Array<any>) =>
         self.handleOnEvent.call(
             self,
             plugin.pluginName,
@@ -507,6 +512,7 @@ export class SBEvents {
             event,
             context,
             listener,
+            traceId,
             iargs,
         ),
     );
@@ -517,14 +523,14 @@ export class SBEvents {
       context: BSBService | BSBServiceClient<any>,
       pluginName: string,
       event: string,
-      listener: { (...args: Array<any>): Promise<void> | void },
+      listener: { (traceId: string | undefined, ...args: Array<any>): Promise<void> | void },
   ): Promise<void> {
     const self = this;
     const plugin = this.getPluginForEvent("onEvent", pluginName, event);
     return await plugin.plugin.onEvent(
         pluginName,
         event + "-" + serverId,
-        async (iargs: Array<any>) =>
+        async (traceId, iargs: Array<any>) =>
             self.handleOnEvent.call(
                 self,
                 plugin.pluginName,
@@ -532,6 +538,7 @@ export class SBEvents {
                 event + "-" + serverId,
                 context,
                 listener,
+                traceId,
                 iargs,
             ),
     );
@@ -540,6 +547,7 @@ export class SBEvents {
   public async emitEvent(
       pluginName: string,
       event: string,
+      traceId: string | undefined,
       ...args: Array<any>
   ): Promise<void> {
     const plugin = this.getPluginForEvent("emitEvent", pluginName, event);
@@ -556,6 +564,7 @@ export class SBEvents {
         plugin.plugin.emitEvent,
         pluginName,
         event,
+        traceId,
         args,
     );
   }
@@ -564,6 +573,7 @@ export class SBEvents {
       serverId: string,
       pluginName: string,
       event: string,
+      traceId: string | undefined,
       ...args: Array<any>
   ): Promise<void> {
     const plugin = this.getPluginForEvent("emitEvent", pluginName, event);
@@ -580,6 +590,7 @@ export class SBEvents {
         plugin.plugin.emitEvent,
         pluginName,
         event + "-" + serverId,
+        traceId,
         args,
     );
   }
@@ -589,12 +600,13 @@ export class SBEvents {
       pluginName: string,
       event: string,
       context: BSBService | BSBServiceClient<any>,
-      listener: { (...args: Array<any>): Promise<any> | any },
+      listener: { (traceId: string | undefined, ...args: Array<any>): Promise<any> | any },
+      traceId: string | undefined,
       iargs: Array<any>,
   ) {
     const start = process.hrtime();
     try {
-      const resp = await SmartFunctionCallAsync(context, listener, ...iargs);
+      const resp = await SmartFunctionCallAsync(context, listener, traceId, ...iargs);
       const diff = process.hrtime(start);
       const time = (
           diff[0] * NS_PER_SEC + diff[1]
@@ -629,7 +641,7 @@ export class SBEvents {
       context: BSBService | BSBServiceClient<any>,
       pluginName: string,
       event: string,
-      listener: { (...args: Array<any>): Promise<void> | void },
+      listener: { (traceId: string | undefined, ...args: Array<any>): Promise<void> | void },
   ): Promise<void> {
     const self = this;
     const plugin = this.getPluginForEvent(
@@ -640,7 +652,7 @@ export class SBEvents {
     return await plugin.plugin.onReturnableEvent(
         pluginName,
         event,
-        async (iargs: Array<any>) =>
+        async (traceId, iargs: Array<any>) =>
             self.handleOnReturnableEvent.call(
                 self,
                 plugin.pluginName,
@@ -648,6 +660,7 @@ export class SBEvents {
                 event,
                 context,
                 listener,
+                traceId,
                 iargs,
             ),
     );
@@ -658,7 +671,7 @@ export class SBEvents {
       context: BSBService | BSBServiceClient<any>,
       pluginName: string,
       event: string,
-      listener: { (...args: Array<any>): Promise<void> | void },
+      listener: { (traceId: string | undefined, ...args: Array<any>): Promise<void> | void },
   ): Promise<void> {
     const self = this;
     const plugin = this.getPluginForEvent(
@@ -669,7 +682,7 @@ export class SBEvents {
     return await plugin.plugin.onReturnableEvent(
         pluginName,
         event + "-" + serverId,
-        async (iargs: Array<any>) =>
+        async (traceId, iargs: Array<any>) =>
             self.handleOnReturnableEvent.call(
                 self,
                 plugin.pluginName,
@@ -677,6 +690,7 @@ export class SBEvents {
                 event + "-" + serverId,
                 context,
                 listener,
+                traceId,
                 iargs,
             ),
     );
@@ -685,6 +699,7 @@ export class SBEvents {
   public async emitEventAndReturn(
       pluginName: string,
       event: string,
+      traceId: string | undefined,
       timeoutSeconds: number,
       ...args: Array<any>
   ): Promise<any> {
@@ -700,6 +715,7 @@ export class SBEvents {
           plugin.plugin.emitEventAndReturn,
           pluginName,
           event,
+          traceId,
           timeoutSeconds,
           args,
       );
@@ -736,6 +752,7 @@ export class SBEvents {
       serverId: string,
       pluginName: string,
       event: string,
+      traceId: string | undefined,
       timeoutSeconds: number,
       ...args: Array<any>
   ): Promise<any> {
@@ -751,6 +768,7 @@ export class SBEvents {
           plugin.plugin.emitEventAndReturn,
           pluginName,
           event + "-" + serverId,
+          traceId,
           timeoutSeconds,
           args,
       );

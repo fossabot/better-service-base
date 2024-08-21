@@ -21,6 +21,7 @@ export interface IPluginMetrics {
    * @param name - The name of the counter metric
    * @param description - A description of the counter metric
    * @param help - More information about the counter metric
+   * @param labels - Optional labels to associate with the counter metric
    * @returns A Counter object that can be used to update the counter metric
    *
    * @example
@@ -31,7 +32,7 @@ export interface IPluginMetrics {
    * counter.inc(10); // Increment the counter by 10
    * ```
    */
-  createCounter(name: string, description: string, help: string): Counter;
+  createCounter<LABELS extends string | undefined>(name: string, description: string, help: string, labels?: LABELS[]): Counter<LABELS>;
 
   /**
    * Creates a gauge metric.
@@ -53,6 +54,7 @@ export interface IPluginMetrics {
    * @param name - The name of the gauge metric
    * @param description - A description of the gauge metric
    * @param help - More information about the gauge metric
+   * @param labels - Optional labels to associate with the gauge metric
    * @returns A Gauge object that can be used to update the gauge metric
    *
    * @example
@@ -67,7 +69,7 @@ export interface IPluginMetrics {
    * gauge.decrement(10); // Decrement the gauge by 10
    * ```
    */
-  createGauge(name: string, description: string, help: string): Gauge;
+  createGauge<LABELS extends string | undefined>(name: string, description: string, help: string, labels?: LABELS[]): Gauge<LABELS>;
 
   /**
    * Creates a histogram metric.
@@ -90,6 +92,7 @@ export interface IPluginMetrics {
    * @param description - A description of the histogram metric
    * @param help - More information about the histogram metric
    * @param boundaries - Optional boundaries for the histogram metric
+   * @param labels - Optional labels to associate with the histogram metric
    * @returns A Histogram object that can be used to update the histogram metric
    *
    * @example
@@ -100,7 +103,7 @@ export interface IPluginMetrics {
    * histogram.record(30); // Record the value 30 in the histogram
    * ```
    */
-  createHistogram(name: string, description: string, help: string, boundaries?: number[]): Histogram;
+  createHistogram<LABELS extends string | undefined>(name: string, description: string, help: string, boundaries?: number[], labels?: LABELS[]): Histogram<LABELS>;
 
   /**
    * Creates a trace metric.
@@ -227,24 +230,24 @@ export interface Span {
   error(error: BSBError<any> | Error, attributes?: Record<string, string>): void;
 }
 
-export interface Counter {
+export interface Counter<LABELS extends string | undefined = undefined> {
   /**
    * Adds a value to the counter metric.
    *
    * @param value - The value to add to the counter metric
    * @param labels - Optional labels to associate with the counter metric
    */
-  inc(value: number, labels?: Record<string, string>): void;
+  inc(value?: number, labels?: LABELS extends string ? Partial<Record<LABELS, string>> : never): void;
 }
 
-export interface Gauge {
+export interface Gauge<LABELS extends string | undefined = undefined> {
   /**
    * Sets the value of the gauge metric.
    *
    * @param value - The value to set the gauge metric
    * @param labels - Optional labels to associate with the gauge metric
    */
-  set(value: number, labels?: Record<string, string>): void;
+  set(value: number, labels?: LABELS extends string ? Partial<Record<LABELS, string>> : never): void;
 
   /**
    * Increments the value of the gauge metric by a specified amount.
@@ -252,7 +255,7 @@ export interface Gauge {
    * @param value - The amount to increment the gauge metric by
    * @param labels - Optional labels to associate with the gauge metric
    */
-  increment(value?: number, labels?: Record<string, string>): void;
+  increment(value?: number, labels?: LABELS extends string ? Partial<Record<LABELS, string>> : never): void;
 
   /**
    * Decrements the value of the gauge metric by a specified amount.
@@ -260,15 +263,15 @@ export interface Gauge {
    * @param value - The amount to decrement the gauge metric by
    * @param labels - Optional labels to associate with the gauge metric
    */
-  decrement(value?: number, labels?: Record<string, string>): void;
+  decrement(value?: number, labels?: LABELS extends string ? Partial<Record<LABELS, string>> : never): void;
 }
 
-export interface Histogram {
+export interface Histogram<LABELS extends string | undefined = undefined> {
   /**
    * Records a value in the histogram metric.
    *
    * @param value - The value to record in the histogram metric
    * @param labels - Optional labels to associate with the histogram metric
    */
-  record(value: number, labels?: Record<string, string>): void;
+  record(value: number, labels?: LABELS extends string ? Partial<Record<LABELS, string>> : never): void;
 }

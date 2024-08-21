@@ -16,7 +16,7 @@ describe("plugins/events-default", () => {
     it("_lastReceivedMessageIds should contain latest emit ID", async () => {
       const emit = new emitDirect(generateNullLogging());
       await emit.onEvent("b", "c", async () => {});
-      await emit.emitEvent("b", "c", []);
+      await emit.emitEvent("b", "c", '', []);
       assert.equal((emit as any)._lastReceivedMessageIds.length, 1);
     });
     it("_lastReceivedMessageIds should call only once", async () => {
@@ -26,7 +26,7 @@ describe("plugins/events-default", () => {
       await emit.onEvent("b", "c", async () => {
         called++;
       });
-      emit.emit(`b-c`, {
+      emit.emit(`b-c`, '', {
         msgID: testID,
         data: [],
       });
@@ -40,11 +40,11 @@ describe("plugins/events-default", () => {
       await emit.onEvent("b", "c", async () => {
         called++;
       });
-      emit.emit(`b-c`, {
+      emit.emit(`b-c`, '', {
         msgID: testID1,
         data: [],
       });
-      emit.emit(`b-c`, {
+      emit.emit(`b-c`, '', {
         msgID: testID2,
         data: [],
       });
@@ -58,7 +58,7 @@ describe("plugins/events-default", () => {
         .map(() => randomUUID());
       await emit.onEvent("b", "c", async () => {});
       for (const emitID of testIDs)
-        emit.emit(`b-c`, {
+        emit.emit(`b-c`, '', {
           msgID: emitID,
           data: [],
         });

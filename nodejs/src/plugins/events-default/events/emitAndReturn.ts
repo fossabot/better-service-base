@@ -17,17 +17,16 @@ export class emitAndReturn
   public async onReturnableEvent(
       pluginName: string,
       event: string,
-      listener: { (args: Array<any>): Promise<any> },
+      listener: { (traceId: string | undefined, args: Array<any>): Promise<any> },
   ): Promise<void> {
     this.log.debug("onReturnableEvent: listening to {pluginName}-{event}", {
       pluginName,
       event,
     });
-    this.on(`${pluginName}-${event}`, async (resolve, reject, data) => {
+    this.on(`${pluginName}-${event}`, async (resolve, reject, traceId, data) => {
       try {
-        resolve(await listener(data));
-      }
-      catch (exc) {
+        resolve(await listener(traceId, data));
+      } catch (exc) {
         reject(exc);
       }
     });
@@ -36,12 +35,12 @@ export class emitAndReturn
   public async emitEventAndReturn(
       pluginName: string,
       event: string,
+      traceId: string | undefined,
       timeoutSeconds: number,
       args: Array<any>,
   ): Promise<any> {
-    this.log.debug("emitReturnableEvent: emitting {pluginName}-{event}", {
-      pluginName,
-      event,
+    this.log.debug("emitReturnableEvent: emitting {pluginName}-{event} with traceId {traceId}", {
+      pluginName, event, traceId: traceId ?? "no-traceId",
     });
     const self = this;
     return new Promise((resolve, reject) => {
@@ -58,6 +57,7 @@ export class emitAndReturn
             clearTimeout(timeoutHandler);
             reject(args);
           },
+          traceId,
           args,
       );
     });

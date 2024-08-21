@@ -17,43 +17,43 @@ export class PluginMetrics
     this.pluginNameSim = Tools.cleanString(plugin, 50, CleanStringStrength.exhard, false);
   }
 
-  public createCounter(name: string, description: string, help: string): Counter {
+  public createCounter<LABELS extends string | undefined>(name: string, description: string, help: string, labels?: LABELS[]): Counter<LABELS> {
     if (!this.metrics.isReady) {
       throw new BSBError("Metrics not ready!");
     }
-    this.metrics.metricsBus.emit("createCounter", Date.now(), this.pluginName, name, description, help);
+    this.metrics.metricsBus.emit("createCounter", Date.now(), this.pluginName, name, description, help, labels);
     return {
-      inc: (value: number, labels?: Record<string, string>) => {
+      inc: (value: number = 1, labels?) => {
         this.metrics.metricsBus.emit("updateCounter", Date.now(), "inc", this.pluginName, name, value, labels);
       },
     };
   }
 
-  public createGauge(name: string, description: string, help: string): Gauge {
+  public createGauge<LABELS extends string | undefined>(name: string, description: string, help: string, labels?: LABELS[]): Gauge<LABELS> {
     if (!this.metrics.isReady) {
       throw new BSBError("Metrics not ready!");
     }
-    this.metrics.metricsBus.emit("createGauge", Date.now(), this.pluginName, name, description, help);
+    this.metrics.metricsBus.emit("createGauge", Date.now(), this.pluginName, name, description, help, labels);
     return {
-      set: (value: number, labels?: Record<string, string>) => {
+      set: (value: number, labels?) => {
         this.metrics.metricsBus.emit("updateGauge", Date.now(), "set", this.pluginName, name, value, labels);
       },
-      increment: (value: number = 1, labels?: Record<string, string>) => {
+      increment: (value: number = 1, labels?) => {
         this.metrics.metricsBus.emit("updateGauge", Date.now(), "inc", this.pluginName, name, value, labels);
       },
-      decrement: (value: number = 1, labels?: Record<string, string>) => {
+      decrement: (value: number = 1, labels?) => {
         this.metrics.metricsBus.emit("updateGauge", Date.now(), "dec", this.pluginName, name, value, labels);
       },
     };
   }
 
-  public createHistogram(name: string, description: string, help: string, boundaries?: number[] | undefined): Histogram {
+  public createHistogram<LABELS extends string | undefined>(name: string, description: string, help: string, boundaries?: number[], labels?: LABELS[]): Histogram<LABELS> {
     if (!this.metrics.isReady) {
       throw new BSBError("Metrics not ready!");
     }
-    this.metrics.metricsBus.emit("createHistogram", Date.now(), this.pluginName, name, description, help, boundaries);
+    this.metrics.metricsBus.emit("createHistogram", Date.now(), this.pluginName, name, description, help, boundaries, labels);
     return {
-      record: (value: number, labels?: Record<string, string>) => {
+      record: (value: number, labels?) => {
         this.metrics.metricsBus.emit("updateHistogram", Date.now(), "record", this.pluginName, name, value, labels);
       },
     };
