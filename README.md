@@ -1,4 +1,5 @@
-[![Docker Image Size](https://img.shields.io/docker/image-size/betterweb/service-base/latest)](https://hub.docker.com/r/betterweb/service-base)
+[![Docker Image Size](https://img.shields.io/docker/image-size/betterweb/service-base/latest)](https://hub.docker.com/r/betterweb/service-base)[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FBetterCorp%2Fbetter-service-base.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FBetterCorp%2Fbetter-service-base?ref=badge_shield)
+
 [![Docker Pulls](https://img.shields.io/docker/pulls/betterweb/service-base)](https://hub.docker.com/r/betterweb/service-base)
 [![Docker Image Version (latest semver)](https://img.shields.io/docker/v/betterweb/service-base?sort=semver)](https://hub.docker.com/r/betterweb/service-base)
 [![GitHub](https://img.shields.io/github/license/BetterCorp/better-service-base)](https://github.com/BetterCorp/better-service-base)
@@ -29,3 +30,6 @@ View the docs here: [https://bsbcode.dev/](https://bsbcode.dev/)
 [BetterCorp](https://www.bettercorp.dev)  
 [Docker](https://www.docker.com)  
 [BrowserStack](https://www.browserstack.com/)  
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FBetterCorp%2Fbetter-service-base.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FBetterCorp%2Fbetter-service-base?ref=badge_large)
